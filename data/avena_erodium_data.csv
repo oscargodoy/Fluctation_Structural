@@ -1,0 +1,9 @@
+﻿order,species ,treatment,lambda_mean,lambda_se,alpha_ii_mean,alpha_ij_mean,alpha_ii_se,alpha_ij_se,lambda_upper,lambda_lower,alpha_ii_lower,alpha_ii_upper,alpha_ij_lower,alpha_ij_upper
+1,Avena,Consistent dry,12.18,2.99,0.02,0.01,0.01,0.01,15.17,9.19,0.03,0.01,0.02,0
+2,Avena,Early season fall dry,7.33,3.44,0.02,0,0.01,0.01,10.77,3.89,0.03,0.01,0.01,-0.01
+3,Avena,Late season spring dry,8.61,5.53,0.03,0,0.04,0.01,14.14,3.08,0.07,-0.01,0.01,-0.01
+4,Avena,Consistent wet,21.27,5.3,0.02,0,0.01,0.01,26.57,15.97,0.03,0.01,0.01,-0.01
+5,Erodium,Consistent dry,23.25,31.3,0.28,0.01,0.45,0.04,54.55,-8.05,0.73,-0.17,0.05,-0.03
+6,Erodium,Early season fall dry,156.99,835.17,1,0.22,5.54,1.3,992.16,-678.18,6.54,-4.54,1.52,-1.08
+7,Erodium,Late season spring dry,3.21,3.39,0.06,0.02,0.1,0.04,6.6,-0.18,0.16,-0.04,0.06,-0.02
+8,Erodium,Consistent wet,1.06,0.73,0.01,0.03,0.02,0.04,1.79,0.33,0.03,-0.01,0.07,-0.01
