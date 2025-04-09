@@ -10,7 +10,7 @@
 library(igraph)
 library(relations)
 library(R6)
-source("R/ISbuild.R")
+source("code/R_toolbox/ISbuild.R")
 
 ########################################################################
 # Obtaining the praph (with igraph)

@@ -10,8 +10,8 @@ library(shape)
 library(randomcoloR)
 library(RColorBrewer)
 library(deSolve)
-source("R/ISbuild.R")
-source("R/figs/sphereCones.R")
+source("code/R_toolbox/ISbuild.R")
+source("code/R_toolbox/figs/sphereCones.R")
 
 # Function to set the distances of a given point to all points and
 # edges (segments joining two vertices) of an IS.

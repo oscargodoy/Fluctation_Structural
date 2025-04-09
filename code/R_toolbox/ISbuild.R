@@ -8,7 +8,7 @@
 
 # Author of the code: Fernando Soler-Toscano - fsoler@us.es
 
-source("R/lemkelcp.R")
+source("code/R_toolbox/lemkelcp.R")
 library(quadprog)
 
 # function to get the GASS with the package LemkeLCP

@@ -1,9 +1,18 @@
 rm(list=ls())
 
 library(dplyr)
+require(devtools)
+install_github("RadicalCommEcol/anisoFun")
 library(anisoFUN) #this package includes most of the functions for structural stability.
 
-source('code/toolbox_coexistence.R')
+source("code/R_toolbox/toolbox_coexistence.R")
+source("code/R_toolbox/lemkelcp.R")
+source("code/R_toolbox/ISbuild.R")
+source("code/R_toolbox/ISgraph.R")
+source("code/R_toolbox/figs/circleCones.R")
+source("code/R_toolbox/figs/sphereCones.R")
+source("code/R_toolbox/figs/sphereSubCones.R")
+source("code/R_toolbox/figs/InformationField.R")
 
 #read data 
 #Hallet et al. 2018 ELE (https://onlinelibrary.wiley.com/doi/10.1111/ele.13341)
@@ -33,7 +42,14 @@ feasibility <- test_feasibility(A,r) #does coexistence occur?
 feasibility
 
 #plot the outcome
-NEED TO DO THIS STILL
+drawCircleCones(A)
+# 1. Draw all cones without labels:  
+drawCircleCones(A, allCones = TRUE, drawLabels = FALSE)
+# 2. Remove cones out of 11:  
+drawCircleCones(A, allCones = FALSE, drawLabels = FALSE)
+# 3. Add labels just for the 11 cone: 
+drawCircleCones(A, allCones = FALSE, drawLabels = TRUE)
+
 
 #Same as before but for the upper bound
 
@@ -60,7 +76,13 @@ feasibility
 
 
 #plot the outcome
-NEED TO DO THIS STILL
+drawCircleCones(A)
+# 1. Draw all cones without labels:  
+drawCircleCones(A, allCones = TRUE, drawLabels = FALSE)
+# 2. Remove cones out of 11:  
+drawCircleCones(A, allCones = FALSE, drawLabels = FALSE)
+# 3. Add labels just for the 11 cone: 
+drawCircleCones(A, allCones = FALSE, drawLabels = TRUE)
 
 #Same as before but for the lower bound
 
@@ -84,6 +106,15 @@ niche <- 10^Omega(A) # this is niche differences
 fitness <- theta(A, r) # this is fitness differences
 feasibility <- test_feasibility(A,r) #does coexistence occur?
 feasibility
+
+#plot the outcome
+drawCircleCones(A)
+# 1. Draw all cones without labels:  
+drawCircleCones(A, allCones = TRUE, drawLabels = FALSE)
+# 2. Remove cones out of 11:  
+drawCircleCones(A, allCones = FALSE, drawLabels = FALSE)
+# 3. Add labels just for the 11 cone: 
+drawCircleCones(A, allCones = FALSE, drawLabels = TRUE)
 
 
 
