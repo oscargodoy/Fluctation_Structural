@@ -1,6 +1,7 @@
 rm(list=ls())
 
 library(dplyr)
+library(broom)
 require(devtools)
 install_github("RadicalCommEcol/anisoFun")
 library(anisoFUN) #this package includes most of the functions for structural stability.
