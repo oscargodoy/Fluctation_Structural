@@ -1,7 +1,6 @@
 rm(list=ls())
 
 library(dplyr)
-library(broom)
 require(devtools)
 install_github("RadicalCommEcol/anisoFun")
 library(anisoFUN) #this package includes most of the functions for structural stability.
@@ -20,7 +19,7 @@ source("code/R_toolbox/figs/InformationField.R")
 d1 <- read.table(file = "data/avena_erodium_data.csv", header=T, sep=",")
 
 # calculate the feasiblity domain for the average environment 
-# 1st step calculate average of each parameter across environments. 
+# 1st step calculate average of each parameter across environments----
 lambda_avena <- d1 %>% filter(species == 'Avena') %>% summarise(avg = mean(lambda_mean))
 lambda_erodium <- d1 %>% filter(species == 'Erodium') %>% summarise(avg = mean(lambda_mean))
 alphaii_avena <- d1 %>% filter(species == 'Avena') %>% summarise(avg = mean(alpha_ii_mean))
@@ -116,6 +115,8 @@ drawCircleCones(A, allCones = TRUE, drawLabels = FALSE)
 drawCircleCones(A, allCones = FALSE, drawLabels = FALSE)
 # 3. Add labels just for the 11 cone: 
 drawCircleCones(A, allCones = FALSE, drawLabels = TRUE)
+
+# 2st step calculate the cone for each environment----
 
 
 
