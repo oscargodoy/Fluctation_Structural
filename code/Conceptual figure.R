@@ -15,10 +15,10 @@ source("code/R_toolbox/figs/InformationField.R")
 dev.off()
 #Define a matrix with some degree of facilitation (positive values)
 A <-matrix(data =NA, nrow = 2, ncol = 2)
-A[1,1] <- -1
-A[2,2] <- -1
-A[1,2] <- -0.3 #facilitation
-A[2,1] <- -0.5
+A[1,1] <- -0.5
+A[2,2] <- -0.5
+A[1,2] <- 0.2 #facilitation
+A[2,1] <- -0.25
 
 #put several vectors on top of the figure. We define four scenarios
 r1 <- c(-0.2,1)
@@ -65,7 +65,7 @@ text(x=0.05, y=1.03, "r2", cex=0.7)
 dev.off()
 
 #2nd step calculate LDGR for each scenario----
-source("code/R_toolbox/LDGR.R")
+source("code/R_toolbox/LDGR_including facilitation.R")
 
 # Define parameters for these four different scenarios (A,B,C,D)
 
@@ -77,26 +77,34 @@ alpha22 <- A[2,2]*-1  # Effect of species 2 on itself
 alpha12 <- A[1,2]*-1 # Effect of species 2 on species 1
 alpha21 <- A[2,1]*-1  # Effect of species 1 on species 2
 
-# Calculate analytical growth rates when rare
-analytical_results <- calculate_growth_rate_when_rare(ra, rb, alpha11, alpha22, alpha12, alpha21)
-print("Analytical results:")
-print(paste("Equilibrium density of species 1 alone:", analytical_results$N1_eq))
-print(paste("Equilibrium density of species 2 alone:", analytical_results$N2_eq))
-print(paste("Growth rate of species 1 when rare (lambda1):", analytical_results$lambda1))
-print(paste("Growth rate of species 2 when rare (lambda2):", analytical_results$lambda2))
+# Run full simulation with equal starting populations
+sim_results <- simulate_competition(
+  ra, rb, alpha11, alpha22, alpha12, alpha21,
+  N1_init = 1.0, 
+  N2_init = 1.0,
+  timesteps = 200
+)
 
-# Verify with simulations
-simulation_results <- simulate_invasion(ra, rb, alpha11, alpha22, alpha12, alpha21)
-print("Simulation results:")
-print(paste("Empirical growth rate of species 1 when rare:", simulation_results$emp_lambda1))
-print(paste("Empirical growth rate of species 2 when rare:", simulation_results$emp_lambda2))
+cat("\nFinal populations after simulation:\n")
+cat(paste("Species 1:", round(sim_results$final_N1, 3), "\n"))
+cat(paste("Species 2:", round(sim_results$final_N2, 3), "\n"))
 
-# Visualize the dynamics
-visualize_dynamics(simulation_results)
+# Determine the outcome
+if(sim_results$final_N1 > 0.01 && sim_results$final_N2 < 0.01) {
+  outcome <- "Species 1 wins (Species 2 goes extinct)"
+} else if(sim_results$final_N1 < 0.01 && sim_results$final_N2 > 0.01) {
+  outcome <- "Species 2 wins (Species 1 goes extinct)"
+} else if(sim_results$final_N1 > 0.01 && sim_results$final_N2 > 0.01) {
+  outcome <- "Coexistence"
+} else {
+  outcome <- "Both species go extinct"
+}
 
-# Analyze coexistence for our example
-coexistence_outcome <- analyze_coexistence(analytical_results$lambda1, analytical_results$lambda2)
-print(paste("Coexistence analysis:", coexistence_outcome))
+cat(paste("Simulation outcome:", outcome, "\n"))
+
+# Plot the dynamics
+par(mfrow=c(1,1))
+visualize_dynamics(sim_results, "Population Dynamics with Equal Starting Populations")
 
 #scenario B
 
@@ -107,26 +115,34 @@ alpha22 <- A[2,2]*-1  # Effect of species 2 on itself
 alpha12 <- A[1,2]*-1 # Effect of species 2 on species 1
 alpha21 <- A[2,1]*-1  # Effect of species 1 on species 2
 
-# Calculate analytical growth rates when rare
-analytical_results <- calculate_growth_rate_when_rare(ra, rb, alpha11, alpha22, alpha12, alpha21)
-print("Analytical results:")
-print(paste("Equilibrium density of species 1 alone:", analytical_results$N1_eq))
-print(paste("Equilibrium density of species 2 alone:", analytical_results$N2_eq))
-print(paste("Growth rate of species 1 when rare (lambda1):", analytical_results$lambda1))
-print(paste("Growth rate of species 2 when rare (lambda2):", analytical_results$lambda2))
+# Run full simulation with equal starting populations
+sim_results <- simulate_competition(
+  ra, rb, alpha11, alpha22, alpha12, alpha21,
+  N1_init = 1.0, 
+  N2_init = 1.0,
+  timesteps = 200
+)
 
-# Verify with simulations
-simulation_results <- simulate_invasion(ra, rb, alpha11, alpha22, alpha12, alpha21)
-print("Simulation results:")
-print(paste("Empirical growth rate of species 1 when rare:", simulation_results$emp_lambda1))
-print(paste("Empirical growth rate of species 2 when rare:", simulation_results$emp_lambda2))
+cat("\nFinal populations after simulation:\n")
+cat(paste("Species 1:", round(sim_results$final_N1, 3), "\n"))
+cat(paste("Species 2:", round(sim_results$final_N2, 3), "\n"))
 
-# Visualize the dynamics
-visualize_dynamics(simulation_results)
+# Determine the outcome
+if(sim_results$final_N1 > 0.01 && sim_results$final_N2 < 0.01) {
+  outcome <- "Species 1 wins (Species 2 goes extinct)"
+} else if(sim_results$final_N1 < 0.01 && sim_results$final_N2 > 0.01) {
+  outcome <- "Species 2 wins (Species 1 goes extinct)"
+} else if(sim_results$final_N1 > 0.01 && sim_results$final_N2 > 0.01) {
+  outcome <- "Coexistence"
+} else {
+  outcome <- "Both species go extinct"
+}
 
-# Analyze coexistence for our example
-coexistence_outcome <- analyze_coexistence(analytical_results$lambda1, analytical_results$lambda2)
-print(paste("Coexistence analysis:", coexistence_outcome))
+cat(paste("Simulation outcome:", outcome, "\n"))
+
+# Plot the dynamics
+par(mfrow=c(1,1))
+visualize_dynamics(sim_results, "Population Dynamics with Equal Starting Populations")
 
 #scenario C
 
@@ -137,26 +153,34 @@ alpha22 <- A[2,2]*-1  # Effect of species 2 on itself
 alpha12 <- A[1,2]*-1 # Effect of species 2 on species 1
 alpha21 <- A[2,1]*-1  # Effect of species 1 on species 2
 
-# Calculate analytical growth rates when rare
-analytical_results <- calculate_growth_rate_when_rare(ra, rb, alpha11, alpha22, alpha12, alpha21)
-print("Analytical results:")
-print(paste("Equilibrium density of species 1 alone:", analytical_results$N1_eq))
-print(paste("Equilibrium density of species 2 alone:", analytical_results$N2_eq))
-print(paste("Growth rate of species 1 when rare (lambda1):", analytical_results$lambda1))
-print(paste("Growth rate of species 2 when rare (lambda2):", analytical_results$lambda2))
+# Run full simulation with equal starting populations
+sim_results <- simulate_competition(
+  ra, rb, alpha11, alpha22, alpha12, alpha21,
+  N1_init = 1.0, 
+  N2_init = 1.0,
+  timesteps = 200
+)
 
-# Verify with simulations
-simulation_results <- simulate_invasion(ra, rb, alpha11, alpha22, alpha12, alpha21)
-print("Simulation results:")
-print(paste("Empirical growth rate of species 1 when rare:", simulation_results$emp_lambda1))
-print(paste("Empirical growth rate of species 2 when rare:", simulation_results$emp_lambda2))
+cat("\nFinal populations after simulation:\n")
+cat(paste("Species 1:", round(sim_results$final_N1, 3), "\n"))
+cat(paste("Species 2:", round(sim_results$final_N2, 3), "\n"))
 
-# Visualize the dynamics
-visualize_dynamics(simulation_results)
+# Determine the outcome
+if(sim_results$final_N1 > 0.01 && sim_results$final_N2 < 0.01) {
+  outcome <- "Species 1 wins (Species 2 goes extinct)"
+} else if(sim_results$final_N1 < 0.01 && sim_results$final_N2 > 0.01) {
+  outcome <- "Species 2 wins (Species 1 goes extinct)"
+} else if(sim_results$final_N1 > 0.01 && sim_results$final_N2 > 0.01) {
+  outcome <- "Coexistence"
+} else {
+  outcome <- "Both species go extinct"
+}
 
-# Analyze coexistence for our example
-coexistence_outcome <- analyze_coexistence(analytical_results$lambda1, analytical_results$lambda2)
-print(paste("Coexistence analysis:", coexistence_outcome))
+cat(paste("Simulation outcome:", outcome, "\n"))
+
+# Plot the dynamics
+par(mfrow=c(1,1))
+visualize_dynamics(sim_results, "Population Dynamics with Equal Starting Populations")
 
 #scenario D
 
@@ -167,25 +191,55 @@ alpha22 <- A[2,2]*-1  # Effect of species 2 on itself
 alpha12 <- A[1,2]*-1 # Effect of species 2 on species 1
 alpha21 <- A[2,1]*-1  # Effect of species 1 on species 2
 
-# Calculate analytical growth rates when rare
-analytical_results <- calculate_growth_rate_when_rare(ra, rb, alpha11, alpha22, alpha12, alpha21)
-print("Analytical results:")
-print(paste("Equilibrium density of species 1 alone:", analytical_results$N1_eq))
-print(paste("Equilibrium density of species 2 alone:", analytical_results$N2_eq))
-print(paste("Growth rate of species 1 when rare (lambda1):", analytical_results$lambda1))
-print(paste("Growth rate of species 2 when rare (lambda2):", analytical_results$lambda2))
+cat("\nEquilibrium densities in monoculture:\n")
+cat(paste("Species 1 alone:", round(analytical_results$N1_eq, 3), "\n"))
+cat(paste("Species 2 alone:", round(analytical_results$N2_eq, 3), "\n"))
 
-# Verify with simulations
-simulation_results <- simulate_invasion(ra, rb, alpha11, alpha22, alpha12, alpha21)
-print("Simulation results:")
-print(paste("Empirical growth rate of species 1 when rare:", simulation_results$emp_lambda1))
-print(paste("Empirical growth rate of species 2 when rare:", simulation_results$emp_lambda2))
+cat("\nInvasion analysis:\n")
+cat(paste("Growth rate of species 1 when rare (lambda1):", round(analytical_results$lambda1, 3), 
+          ifelse(analytical_results$lambda1 > 1, " (can invade)", " (cannot invade)"), "\n"))
+cat(paste("Growth rate of species 2 when rare (lambda2):", round(analytical_results$lambda2, 3),
+          ifelse(analytical_results$lambda2 > 1, " (can invade)", " (cannot invade)"), "\n"))
 
-# Visualize the dynamics
-visualize_dynamics(simulation_results)
+# Analyze coexistence
+coexistence_analysis <- analyze_coexistence(
+  analytical_results$lambda1, 
+  analytical_results$lambda2,
+  analytical_results$N1_coex,
+  analytical_results$N2_coex
+)
 
-# Analyze coexistence for our example
-coexistence_outcome <- analyze_coexistence(analytical_results$lambda1, analytical_results$lambda2)
-print(paste("Coexistence analysis:", coexistence_outcome))
+cat("\nCoexistence analysis:\n")
+cat(paste(coexistence_analysis$outcome, "\n"))
+cat(paste(coexistence_analysis$note, "\n"))
+
+# Run full simulation with equal starting populations
+sim_results <- simulate_competition(
+  r1, r2, alpha11, alpha22, alpha12, alpha21,
+  N1_init = 1.0, 
+  N2_init = 1.0,
+  timesteps = 200
+)
+
+cat("\nFinal populations after simulation:\n")
+cat(paste("Species 1:", round(sim_results$final_N1, 3), "\n"))
+cat(paste("Species 2:", round(sim_results$final_N2, 3), "\n"))
+
+# Determine the outcome
+if(sim_results$final_N1 > 0.01 && sim_results$final_N2 < 0.01) {
+  outcome <- "Species 1 wins (Species 2 goes extinct)"
+} else if(sim_results$final_N1 < 0.01 && sim_results$final_N2 > 0.01) {
+  outcome <- "Species 2 wins (Species 1 goes extinct)"
+} else if(sim_results$final_N1 > 0.01 && sim_results$final_N2 > 0.01) {
+  outcome <- "Coexistence"
+} else {
+  outcome <- "Both species go extinct"
+}
+
+cat(paste("Simulation outcome:", outcome, "\n"))
+
+# Plot the dynamics
+par(mfrow=c(1,1))
+visualize_dynamics(sim_results, "Population Dynamics with Equal Starting Populations")
 
   
