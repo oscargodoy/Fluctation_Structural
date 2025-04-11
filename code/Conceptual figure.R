@@ -20,9 +20,9 @@ A[2,1] <- -0.5
 
 #put several vector on top of the figure 
 r1 <- c(-0.2,1)
-r2 <- c(0.3,1)
-r3 <- c(1,1)
-r4 <- c(1,1)
+r2 <- c(0.7,1)
+r3 <- c(2,1)
+r4 <- c(2.2,0.6)
 
 # 2. Plot the cone without labels 
 drawCircleCones(A, allCones = FALSE, drawLabels = FALSE)
@@ -31,6 +31,24 @@ drawCircleCones(A, allCones = FALSE, drawLabels = FALSE)
 point1 <-r1/sqrt(sum(r1^2))
 points(point1[1], point1[2], pch=19, col="red", cex=0.75)
 arrows(0, 0, x1 = point1[1], y1 = point1[2], length = 0.05, angle = 30,
+       code = 2, col = par("fg"), lty = 2,
+       lwd = par("lwd"))
+
+point2 <-r2/sqrt(sum(r2^2))
+points(point2[1], point2[2], pch=19, col="red", cex=0.75)
+arrows(0, 0, x1 = point2[1], y1 = point2[2], length = 0.05, angle = 30,
+       code = 2, col = par("fg"), lty = 2,
+       lwd = par("lwd"))
+
+point3 <-r3/sqrt(sum(r3^2))
+points(point3[1], point3[2], pch=19, col="red", cex=0.75)
+arrows(0, 0, x1 = point3[1], y1 = point3[2], length = 0.05, angle = 30,
+       code = 2, col = par("fg"), lty = 2,
+       lwd = par("lwd"))
+
+point4 <-r4/sqrt(sum(r4^2))
+points(point4[1], point4[2], pch=19, col="red", cex=0.75)
+arrows(0, 0, x1 = point4[1], y1 = point4[2], length = 0.05, angle = 30,
        code = 2, col = par("fg"), lty = 2,
        lwd = par("lwd"))
 
