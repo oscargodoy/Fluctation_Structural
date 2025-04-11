@@ -65,9 +65,15 @@ text(x=0.05, y=1.03, "r2", cex=0.7)
 dev.off()
 
 #2nd step calculate LDGR for each scenario----
-source("code/R_toolbox/LDGR_including facilitation.R")
+source("code/LDGR_including facilitation.R")
 
 # Define parameters for these four different scenarios (A,B,C,D)
+
+#put several vectors on top of the figure. We define four scenarios
+r1 <- c(-0.2,1)
+r2 <- c(0.7,1)
+r3 <- c(2,1)
+r4 <- c(2.2,0.3)
 
 #scenario A
 ra <-r1[1]   # Intrinsic growth rate of species 1
@@ -190,36 +196,6 @@ alpha11 <- A[1,1]*-1 # Effect of species 1 on itself
 alpha22 <- A[2,2]*-1  # Effect of species 2 on itself
 alpha12 <- A[1,2]*-1 # Effect of species 2 on species 1
 alpha21 <- A[2,1]*-1  # Effect of species 1 on species 2
-
-cat("\nEquilibrium densities in monoculture:\n")
-cat(paste("Species 1 alone:", round(analytical_results$N1_eq, 3), "\n"))
-cat(paste("Species 2 alone:", round(analytical_results$N2_eq, 3), "\n"))
-
-cat("\nInvasion analysis:\n")
-cat(paste("Growth rate of species 1 when rare (lambda1):", round(analytical_results$lambda1, 3), 
-          ifelse(analytical_results$lambda1 > 1, " (can invade)", " (cannot invade)"), "\n"))
-cat(paste("Growth rate of species 2 when rare (lambda2):", round(analytical_results$lambda2, 3),
-          ifelse(analytical_results$lambda2 > 1, " (can invade)", " (cannot invade)"), "\n"))
-
-# Analyze coexistence
-coexistence_analysis <- analyze_coexistence(
-  analytical_results$lambda1, 
-  analytical_results$lambda2,
-  analytical_results$N1_coex,
-  analytical_results$N2_coex
-)
-
-cat("\nCoexistence analysis:\n")
-cat(paste(coexistence_analysis$outcome, "\n"))
-cat(paste(coexistence_analysis$note, "\n"))
-
-# Run full simulation with equal starting populations
-sim_results <- simulate_competition(
-  r1, r2, alpha11, alpha22, alpha12, alpha21,
-  N1_init = 1.0, 
-  N2_init = 1.0,
-  timesteps = 200
-)
 
 cat("\nFinal populations after simulation:\n")
 cat(paste("Species 1:", round(sim_results$final_N1, 3), "\n"))

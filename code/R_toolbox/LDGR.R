@@ -10,10 +10,10 @@ calculate_growth_rate_when_rare <- function(ra, rb, alpha11, alpha22, alpha12, a
   # alpha21: competitive effect of species 1 on species 2 (interspecific)
   
   # Calculate equilibrium density of species 1 in absence of species 2
-  N1_eq <- 2/alpha11
+  N1_eq <- ra/alpha11
   
   # Calculate equilibrium density of species 2 in absence of species 1
-  N2_eq <- 2/alpha22
+  N2_eq <- rb/alpha22
   
   # Calculate invasion fitness (growth rate when rare) for species 1
   # when species 2 is at equilibrium
@@ -40,14 +40,14 @@ calculate_growth_rate_when_rare <- function(ra, rb, alpha11, alpha22, alpha12, a
 
 # Function to run simulations to verify growth rates
 simulate_invasion <- function(ra, rb, alpha11, alpha22, alpha12, alpha21, 
-                              initial_rare = 0.1, timesteps = 1000) {
+                              initial_rare = 0.01, timesteps = 1000) {
   # Parameters for simulation
   # initial_rare: initial population size of the invader
   # timesteps: number of time steps to simulate
   
   # Calculate equilibrium densities
-  N1_eq <- 10/alpha11
-  N2_eq <- 10/alpha22
+  N1_eq <- ra/alpha11
+  N2_eq <- rb/alpha22
   
   # Run two simulations: 
   # 1. Species 1 invading Species 2 at equilibrium
@@ -74,8 +74,8 @@ simulate_invasion <- function(ra, rb, alpha11, alpha22, alpha12, alpha21,
   M2[1] <- initial_rare
   
   for (t in 1:(timesteps-1)) {
-    M1[t+1] <- M1[t] * (2 + ra * (1 - alpha11 * M1[t] - alpha12 * M2[t]))
-    M2[t+1] <- M2[t] * (2 + rb * (1 - alpha22 * M2[t] - alpha21 * M1[t]))
+    M1[t+1] <- M1[t] * (1 + ra * (1 - alpha11 * M1[t] - alpha12 * M2[t]))
+    M2[t+1] <- M2[t] * (1 + rb * (1 - alpha22 * M2[t] - alpha21 * M1[t]))
   }
   
   # Calculate empirical growth rate for species 2 when rare
@@ -136,12 +136,12 @@ visualize_dynamics <- function(sim_results) {
 
 # Example usage with intraspecific competition
 # Define parameters
-ra <- 0.2        # Intrinsic growth rate of species 1
-rb <- 1        # Intrinsic growth rate of species 2
+ra <- 2.2        # Intrinsic growth rate of species 1
+rb <- 0.3        # Intrinsic growth rate of species 2
 alpha11 <- 1   # Intraspecific competition for species 1
 alpha22 <- 1   # Intraspecific competition for species 2
-alpha12 <- -0.3  # Competitive effect of species 2 on species 1
-alpha21 <- -0.5  # Competitive effect of species 1 on species 2
+alpha12 <- 0.3  # Competitive effect of species 2 on species 1
+alpha21 <- 0.5  # Competitive effect of species 1 on species 2
 
 # Calculate analytical growth rates when rare
 analytical_results <- calculate_growth_rate_when_rare(ra, rb, alpha11, alpha22, alpha12, alpha21)
