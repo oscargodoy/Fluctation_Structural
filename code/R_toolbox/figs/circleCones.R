@@ -66,7 +66,7 @@ drawCircleCones <- function(gamma, allCones = TRUE, drawLabels = TRUE){
   # The second list, "light" versions of the first three colors
   colors1 <- c("#80FF00E0","#0080FFE0","#FF8000E0","#A0A0A0E0")
   colors2 <- c("#80FF0080","#0080FF80","#FF800080")
-  plot(c(-1.5, 1.5), c(-1.5, 1.5), type = "n", axes = FALSE, ann = FALSE, asp = 1)
+  plot(c(-0.3, 1), c(-0.5, 1), type = "n", axes = FALSE, ann = FALSE, asp = 1)
   coneLabelsSize <- matrix(0, ncol=2, nrow=6)
   # cone 00 (always 3rd quadrant)
   if(allCones) draw.sector(180, 270,clock.wise = FALSE, col = colors1[4], border = NA)
@@ -119,8 +119,8 @@ drawCircleCones <- function(gamma, allCones = TRUE, drawLabels = TRUE){
   lines(c(0,0), c(-1.1,1.1), lwd=1)
   if(drawLabels){
     # Axes labels
-    text(-1.3,0, expression('b'[1]),cex=1.3)
-    text(0,-1.3, expression('b'[2]),cex=1.3)
+    text(-1.3,0, expression('r'[1]),cex=1.3)
+    text(0,-1.3, expression('r'[2]),cex=1.3)
     for(i in labelsDraw){
       writeConeSize(coneLabelsSize[i,1], coneLabelsSize[i,2])
       drawIScone(as.double(iss[i,1]), as.double(iss[i,2]), iss[i,3])
