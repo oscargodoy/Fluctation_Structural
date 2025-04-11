@@ -52,5 +52,8 @@ arrows(0, 0, x1 = point4[1], y1 = point4[2], length = 0.05, angle = 30,
        code = 2, col = par("fg"), lty = 2,
        lwd = par("lwd"))
 
+text(x=1, y=-0.05, "r1", cex=0.7)
+text(x=0.05, y=1.03, "r2", cex=0.7)
+
 
   
