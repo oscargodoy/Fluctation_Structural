@@ -368,7 +368,7 @@ rasterImage(img3, 0.9, 0.53, 1.2, 0.83)
 rasterImage(img4, 1, 0.2, 1.3, 0.5)
 
 # Add a title to the plot
-title(main = "LDGR into Structural Stability", cex.main = 1)
+title(main = "Low density growth rate under different scenarios", cex.main = 1)
 
 # Save the plot as a JPEG file
 jpeg(file="figures/LDGR_cone.jpeg", width = 800, height = 800)

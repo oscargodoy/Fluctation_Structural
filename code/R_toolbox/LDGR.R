@@ -136,12 +136,12 @@ visualize_dynamics <- function(sim_results) {
 
 # Example usage with intraspecific competition
 # Define parameters
-ra <- 2.2        # Intrinsic growth rate of species 1
-rb <- 0.3        # Intrinsic growth rate of species 2
-alpha11 <- 1   # Intraspecific competition for species 1
-alpha22 <- 1   # Intraspecific competition for species 2
-alpha12 <- 0.3  # Competitive effect of species 2 on species 1
-alpha21 <- 0.5  # Competitive effect of species 1 on species 2
+ra <- 3.5        # Intrinsic growth rate of species 1
+rb <- 1        # Intrinsic growth rate of species 2
+alpha11 <- 0.75   # Intraspecific competition for species 1
+alpha22 <- 0.75   # Intraspecific competition for species 2
+alpha12 <- 0.25  # Competitive effect of species 2 on species 1
+alpha21 <- 0.25  # Competitive effect of species 1 on species 2
 
 # Calculate analytical growth rates when rare
 analytical_results <- calculate_growth_rate_when_rare(ra, rb, alpha11, alpha22, alpha12, alpha21)
