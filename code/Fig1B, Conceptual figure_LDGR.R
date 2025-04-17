@@ -376,4 +376,100 @@ jpeg(file="figures/LDGR_cone.jpeg", width = 800, height = 800)
 pdf(file="figures/LDGR_cone.pdf", width = 12, height = 12)
 dev.off()
 
+# Illustrating the Figure ----
+
+# Create a new plot
+par(mar = c(4, 4, 3, 3))  # Set margins
+plot(NULL, xlim = c(-0.99, 0.99), ylim = c(-0.99, 0.99), asp = 1,
+     xlab = " ", ylab = " ", main = " LDGR under different scenarios")
+
+# Draw the unit circle
+theta <- seq(0, 2*pi, length.out = 1000)
+x_circle <- cos(theta)
+y_circle <- sin(theta)
+lines(x_circle, y_circle, col = "black", lwd = 2)
+
+# Add coordinate axes
+abline(h = 0, v = 0, col = "gray", lty = 2)
+
+# Number of cones to draw
+num_cones <- 2
+
+# Starting positions for cones (in radians)
+start_positions <- c(1.01, 1.77)
+
+
+# Different widths for each cone (in radians)
+cone_widths <- c(pi/2.8, pi/8)
+
+# Colors for the cones
+cone_colors <- c("lightgreen","lightblue")
+
+
+# Draw each cone
+for (i in 1:num_cones) {
+  # Cone center angle and width
+  center_angle <- start_positions[i]
+  width <- cone_widths[i]
+  
+  # Calculate arc on the unit circle for this cone
+  arc_angles <- seq(center_angle - width/2, center_angle + width/2, length.out = 100)
+  x_arc <- cos(arc_angles)
+  y_arc <- sin(arc_angles)
+  
+  # Draw filled cone
+  polygon(c(0, x_arc, 0), c(0, y_arc, 0), col = adjustcolor(cone_colors[i], alpha = 0.3), border = NA)
+  
+  # Draw cone borders
+  segments(0, 0, cos(center_angle - width/2), sin(center_angle - width/2), col = cone_colors[i], lwd = 2)
+  segments(0, 0, cos(center_angle + width/2), sin(center_angle + width/2), col = cone_colors[i], lwd = 2)
+  
+  # Draw arc on unit circle
+  lines(x_arc, y_arc, col = cone_colors[i], lwd = 2)
+  
+  # Add label in the middle of each cone
+  label_angle <- center_angle
+  label_r <- 0.65  # position of label (distance from origin)
+  text(label_r * cos(label_angle), label_r * sin(label_angle), 
+       paste0(" "), col = "black", cex = 0.8)
+}
+
+lines(x_circle, y_circle, col = "black", lwd = 2)
+
+#draw a single vector that starts from origin zero, and its normalized
+#put several vectors on top of the figure. We define four scenarios
+r1 <- c(-0.2,1)
+r2 <- c(0.7,1)
+r3 <- c(2,0.95)
+r4 <- c(2.2,0.3)
+
+point1 <-r1/sqrt(sum(r1^2))
+points(point1[1], point1[2], pch=19, col="red", cex=1)
+arrows(0, 0, x1 = point1[1], y1 = point1[2], length = 0.05, angle = 30,
+       code = 2, col = par("fg"), lty = 2,
+       lwd = par("lwd"))
+text(x=point1[1]+0.05, y=point1[2]+0.05, "A", cex=1)
+
+point2 <-r2/sqrt(sum(r2^2))
+points(point2[1], point2[2], pch=19, col="red", cex=1)
+arrows(0, 0, x1 = point2[1], y1 = point2[2], length = 0.05, angle = 30,
+       code = 2, col = par("fg"), lty = 2,
+       lwd = par("lwd"))
+text(x=point2[1]+0.05, y=point2[2]+0.04, "B", cex=1)
+
+point3 <-r3/sqrt(sum(r3^2))
+points(point3[1], point3[2], pch=19, col="red", cex=1)
+arrows(0, 0, x1 = point3[1], y1 = point3[2], length = 0.05, angle = 30,
+       code = 2, col = par("fg"), lty = 2,
+       lwd = par("lwd"))
+text(x=point3[1]+0.05, y=point3[2]+0.04, "C", cex=1)
+
+point4 <-r4/sqrt(sum(r4^2))
+points(point4[1], point4[2], pch=19, col="red", cex=1)
+arrows(0, 0, x1 = point4[1], y1 = point4[2], length = 0.05, angle = 30,
+       code = 2, col = par("fg"), lty = 2,
+       lwd = par("lwd"))
+text(x=point4[1]+0.05, y=point4[2]+0.04, "D", cex=1)
+
+
   

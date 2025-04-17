@@ -112,26 +112,64 @@ for (i in 1:length(param_space$ra_range)) {
   }
 }
 
-plot(outcome_matrix[,1],
-     log(param_space$lambda1_matrix[,1]), 
-     xlab = "Distance to the edge of the feasbility domain", 
-     ylab = "Low Density Growth Rate (log scale)", 
-     xlim = c(-0.05, 0.5),
-     ylim = c(-0.3, 1.5),
-     main = " Relating structural stability to low density growth rate",
-     pch = 19, col = "blue")
+#Plot the outcome
+# Set theme for consistent, clean appearance
+library(ggplot2)
 
-#add a line to the plot with other lambda2 values
-points(outcome_matrix[,1], log(param_space$lambda2_matrix[,1]), pch = 19, col = "red")
+# Create a data frame for plotting
+df <- data.frame(
+  distance = outcome_matrix[,1],
+  lambda1 = log(param_space$lambda1_matrix[,1]),
+  lambda2 = log(param_space$lambda2_matrix[,1])
+)
 
-# add a vertical line at x = 0
-abline(v = 0, col = "black", lty = 2)
-# add a horizontal line at y = 0
-abline(h = 0, col = "black", lty = 2)
+# Convert to long format for easier plotting
+df_long <- reshape2::melt(df, id.vars = "distance", 
+                          variable.name = "parameter", 
+                          value.name = "log_value")
 
-text(0.15,0.5,"Mutual invasibility")
-text(-0.05, 0.5, "Exclusion", v)
-
+# Create enhanced plot
+ggplot(df_long, aes(x = distance, y = log_value, color = parameter, shape = parameter)) +
+  # Add points with better size and transparency
+  geom_point(size = 3, alpha = 0.7) +
+  # Add reference lines with better styling
+  geom_vline(xintercept = 0, linetype = "dashed", color = "darkgray", size = 0.7) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "darkgray", size = 0.7) +
+  # Add annotations for regions
+  annotate("text", x = 0.15, y = 0.5, label = "Mutual invasibility", 
+           fontface = "bold", size = 4.5) +
+  annotate("text", x = -0.025, y = 0.7, label = "Exclusion", 
+           fontface = "bold", angle = 90, size = 4.5) +
+  # Add regression lines to help visualize trends
+  geom_smooth(method = "loess", se = FALSE, linetype = "solid", alpha = 0.7, size = 1) +
+  # Set colors with a better palette
+  scale_color_manual(values = c("lambda1" = "#0072B2", "lambda2" = "#D55E00"),
+                     labels = c("Superior competitor", "Inferior competitor")) +
+  scale_shape_manual(values = c(16, 16),
+                     labels = c("Superior competitor", "Inferior competitor")) +
+  # Improve labels and title
+  labs(
+    x = "Distance to Edge of Feasibility Domain",
+    y = "Low Density Growth Rate (log scale)",
+    title = "Structural Stability and Low Density Growth Rate",
+    color = "Parameter",
+    shape = "Parameter"
+  ) +
+  # Set plot theme for better appearance
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(size = 11, color = "darkgray"),
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold"),
+    panel.grid.minor = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.border = element_rect(color = "gray80", fill = NA),
+    axis.title = element_text(face = "bold"),
+    axis.text = element_text(size = 11)
+  ) +
+  # Set consistent plot dimensions
+  coord_cartesian(xlim = c(-0.05, 0.5), ylim = c(-0.3, 1.5))
 
 
 
