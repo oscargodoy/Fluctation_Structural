@@ -223,9 +223,13 @@ species_values <- c(sp1 = ldgr[1,1], sp2 = ldgr[1,2])
 # Create the bar plot
 jpeg(file="figures/barplot_scenario_A.jpeg")
 barplot(species_values,
-        ylab = "LDGR",
-        col = c("lightgrey", "lightgrey"),
+        ylab = "",
+        main = "A",
+        col = c("lightblue", "orange"),
         ylim = c(0, 1.5),
+        cex.lab = 3,
+        cex.axis = 3,
+        cex.main = 4,
         border = "black",
         names.arg = c(" ", " "))
 
@@ -236,8 +240,8 @@ barplot(species_values,
 text(x = c(0.7, 1.9), 
      y = species_values + 0.10, 
      labels = round(species_values, 2),
-     cex = 4)
-
+     cex = 3)
+text(x = 0.75, y = 0.3, "NA", cex = 3)
 
 dev.off()
 
@@ -248,11 +252,16 @@ species_values <- c(sp1 = ldgr[2,1], sp2 = ldgr[2,2])
 # Create the bar plot
 jpeg(file="figures/barplot_scenario_B.jpeg")
 barplot(species_values,
-        ylab = "LDGR",
-        col = c("lightgrey", "lightgrey"),
+        ylab = " ",
+        main = "B",
+        col = c("lightblue", "orange"),
         ylim = c(0, 1.5),
+        cex.lab = 3,
+        cex.axis = 3,
+        cex.main = 4,
         border = "black",
         names.arg = c(" ", " "))
+
 
 # Add a grid for better readability
 #grid(nx = NA, ny = NULL, lty = 2, col = "gray")
@@ -271,11 +280,16 @@ species_values <- c(sp1 = ldgr[3,1], sp2 = ldgr[3,2])
 # Create the bar plot
 jpeg(file="figures/barplot_scenario_C.jpeg")
 barplot(species_values,
-        ylab = "LDGR",
-        col = c("lightgrey", "lightgrey"),
-        ylim = c(0, 1.5),
+        ylab = " ",
+        main = "C",
+        col = c("lightblue", "orange"),
+        ylim = c(0, 1.6),
+        cex.lab = 3,
+        cex.axis = 3,
+        cex.main = 4,
         border = "black",
         names.arg = c(" ", " "))
+
 # Add a grid for better readability
 #grid(nx = NA, ny = NULL, lty = 2, col = "gray")
 
@@ -292,11 +306,16 @@ species_values <- c(sp1 = ldgr[4,1], sp2 = ldgr[4,2])
 # Create the bar plot
 jpeg(file="figures/barplot_scenario_D.jpeg")
 barplot(species_values,
-        ylab = "LDGR",
-        col = c("lightgrey", "black"),
+        ylab = " ",
+        main = "D",
+        col = c("lightblue", "orange"),
         ylim = c(0, 1.5),
+        cex.lab = 3,
+        cex.axis = 3,
+        cex.main = 4,
         border = "black",
         names.arg = c(" ", " "))
+
 # Add a grid for better readability
 #grid(nx = NA, ny = NULL, lty = 2, col = "gray")
 
@@ -376,7 +395,7 @@ jpeg(file="figures/LDGR_cone.jpeg", width = 800, height = 800)
 pdf(file="figures/LDGR_cone.pdf", width = 12, height = 12)
 dev.off()
 
-# Illustrating the Figure ----
+# Illustrating the Figure in a better way----
 
 # Create a new plot
 par(mar = c(4, 4, 3, 3))  # Set margins
@@ -403,7 +422,7 @@ start_positions <- c(1.01, 1.77)
 cone_widths <- c(pi/2.8, pi/8)
 
 # Colors for the cones
-cone_colors <- c("lightgreen","lightblue")
+cone_colors <- c("green3","lightgreen")
 
 
 # Draw each cone
@@ -472,4 +491,11 @@ arrows(0, 0, x1 = point4[1], y1 = point4[2], length = 0.05, angle = 30,
 text(x=point4[1]+0.05, y=point4[2]+0.04, "D", cex=1)
 
 
-  
+# Add images to the plot 
+rasterImage(img1, -0.85, -0.45, -0.45, 0)
+rasterImage(img2, -0.45, -0.45, -0.05, 0)
+rasterImage(img3, 0.05, -0.45, 0.45, 0)
+rasterImage(img4, 0.45, -0.45, 0.85, 0)
+text(x = -0.88, y = -0.22, labels = "LDGR", srt = 90, cex = 0.8)
+
+
