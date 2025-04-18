@@ -498,4 +498,6 @@ rasterImage(img3, 0.05, -0.45, 0.45, 0)
 rasterImage(img4, 0.45, -0.45, 0.85, 0)
 text(x = -0.88, y = -0.22, labels = "LDGR", srt = 90, cex = 0.8)
 
+jpeg(file="figures/LDGR_cone.jpeg", width = 800, height = 800)
+
 
