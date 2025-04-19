@@ -44,14 +44,6 @@ fitness <- theta(A, r) # this is fitness differences
 feasibility <- test_feasibility(A,r) #does coexistence occur?
 feasibility
 
-#plot the outcome
-drawCircleCones(A)
-# 1. Draw all cones without labels:  
-drawCircleCones(A, allCones = TRUE, drawLabels = FALSE)
-# 2. Remove cones out of 11:  
-drawCircleCones(A, allCones = FALSE, drawLabels = FALSE)
-# 3. Add labels just for the 11 cone: 
-drawCircleCones(A, allCones = FALSE, drawLabels = TRUE)
 
 #normalize the vector r
 point <-r/sqrt(sum(r^2))

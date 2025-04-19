@@ -1,9 +1,11 @@
-library(circlize)
+
 
 #################################################################
 # Functions to draw the 2D cones
 # Author: Fernando Soler-Toscano - fsoler@us.es
 #################################################################
+
+library(circlize)
 
 # Normalize a vector
 normVec <- function(vec){
@@ -34,7 +36,7 @@ getAnglePoint <- function(p){
   360*angle/(2*pi)
 }
 
-# Write the laben indicating the cone size
+# Write the label indicating the cone size
 writeConeSize <- function(init,end){
   if(init%%360 != end%%360){
     ang <- 2*pi*(init+end)/720
