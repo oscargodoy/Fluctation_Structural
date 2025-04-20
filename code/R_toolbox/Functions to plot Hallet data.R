@@ -1,6 +1,4 @@
 
-
-
 # simplified version for a single cone----
 
 library(circlize)
@@ -37,7 +35,7 @@ draw_biodiversity_cone <- function(gamma) {
   cone <- get_cone_angles(gamma)
   
   # Setup plotting area
-  plot(c(-1.1, 1.1), c(-1.1, 1.1), type = "n", 
+  plot(c(0, 1.1), c(0, 1.1), type = "n", 
        axes = FALSE, ann = FALSE, asp = 1)
   
   
@@ -52,26 +50,26 @@ draw_biodiversity_cone <- function(gamma) {
   
   # Draw the main biodiversity cone
   draw.sector(start_angle, end_angle, clock.wise = FALSE, 
-              col = "green3", border = NA)
+              col = adjustcolor("green3", alpha = 0.3), border = "green", lwd=2)
   
   # Draw axes
-  lines(c(-1.1, 1.1), c(0, 0), lwd = 1)
-  lines(c(0, 0), c(-1.1, 1.1), lwd = 1)
-  text(-1.1, 0, expression('r'[1]), cex = 1.3, pos = 2)
-  text(0, -1.1, expression('r'[2]), cex = 1.3, pos = 1)
-  
+  lines(c(-0.2, 1), c(0, 0), lwd = 1)
+  lines(c(0, 0), c(-0.2, 1), lwd = 1)
+  text(1.2, 0, "Avena", cex = 1.2, pos = 2)
+  text(0, 1.1, "Erodium", cex = 1.2, pos = 1)
+  axis(1,at=c(0, 0.2, 0.4, 0.6, 0.8 ,1), labels=c("0","0.2", "0.4", "0.6", "0.8","1.0"), pos=c(0,0) ,cex.axis=1.2)
+  axis(2,at=c(0, 0.2, 0.4, 0.6, 0.8 ,1), labels=c("0","0.2", "0.4", "0.6", "0.8","1.0"), pos=c(0,0) ,cex.axis=1.2)
   
   # Draw unit circle outline for reference
   symbols(0, 0, circles = 1, inches = FALSE, add = TRUE, fg = "gray", lwd = 1)
 }
 
 # Example usage:
-gamma <- -1*matrix(c(1, 0.5, 0.2, 1), nrow = 2)
-draw_biodiversity_cone(gamma)
+#gamma <- -1*matrix(c(1, 0.5, 0.2, 1), nrow = 2)
+#draw_biodiversity_cone(gamma)
 
 
 #mulitple matrices----
-
 library(circlize)
 
 # Calculate the cone angles from interaction matrix
@@ -102,23 +100,26 @@ get_cone_size <- function(cone) {
 }
 
 # Draw multiple biodiversity cones from a list of gamma matrices
-draw_multiple_cones <- function(gamma_list, colors = NULL, labels = NULL, show_sizes = TRUE) {
+draw_multiple_cones <- function(gamma_list, colors = NULL, labels = NULL, show_sizes = FALSE) {
   # Setup plotting area
-  plot(c(-1.1, 1.1), c(-1.1, 1.1), type = "n", 
+  plot(c(0, 1.1), c(0, 1.1), type = "n", 
        axes = FALSE, ann = FALSE, asp = 1, xlab = "", ylab = "")
   
   # Draw unit circle outline for reference
   symbols(0, 0, circles = 1, inches = FALSE, add = TRUE, fg = "gray", lwd = 1)
   
   # Draw axes
-  lines(c(-1.1, 1.1), c(0, 0), lwd = 1)
-  lines(c(0, 0), c(-1.1, 1.1), lwd = 1)
-  text(-1.1, 0, expression('r'[1]), cex = 1.3, pos = 2)
-  text(0, -1.1, expression('r'[2]), cex = 1.3, pos = 1)
+  lines(c(-0.2, 1), c(0, 0), lwd = 1)
+  lines(c(0, 0), c(-0.2, 1), lwd = 1)
+  text(1.2, 0, "Avena", cex = 1.2, pos = 2)
+  text(0, 1.05, "Erodium", cex = 1.2, pos = 3, srt=0)
+  axis(1,at=c(0, 0.2, 0.4, 0.6, 0.8 ,1), labels=c("0","0.2", "0.4", "0.6", "0.8","1.0"), pos=c(0,0) ,cex.axis=1.2)
+  axis(2,at=c(0, 0.2, 0.4, 0.6, 0.8 ,1), labels=c("0","0.2", "0.4", "0.6", "0.8","1.0"), pos=c(0,0) ,cex.axis=1.2)
+  
   
   # Set default colors if not provided
   if(is.null(colors)) {
-    colors <- rainbow(length(gamma_list), alpha = 0.6)
+    colors <- rep("green3", times=length(gamma_list))
   }
   
   # Set default labels if not provided
@@ -144,37 +145,38 @@ draw_multiple_cones <- function(gamma_list, colors = NULL, labels = NULL, show_s
     
     # Draw this cone
     draw.sector(start_angle, end_angle, clock.wise = FALSE, 
-                col = colors[i], border = NA)
-    
+                col = adjustcolor(colors[i], alpha = 0.3), border = "green", lwd=2)
+  
     # Add cone size label if requested
-    #if(show_sizes) {
-    #  cone_size <- get_cone_size(cone)
-    #  mid_angle <- 2*pi*(start_angle + (end_angle - start_angle)/2)/360
-    #  label_radius <- 1.15 + (0.1 * ((i-1) %% 3))  # Stagger labels at different radii
-    #  text(label_radius*cos(mid_angle), label_radius*sin(mid_angle), 
-    #       round(cone_size, digits = 2), cex = 0.9, col = colors[i])
-    #}
+    if(show_sizes) {
+      cone_size <- get_cone_size(cone)
+      mid_angle <- 2*pi*(start_angle + (end_angle - start_angle)/2)/360
+      label_radius <- 1.15 + (0.1 * ((i-1) %% 3))  # Stagger labels at different radii
+      text(label_radius*cos(mid_angle), label_radius*sin(mid_angle), 
+           round(cone_size, digits = 2), cex = 0.9, col = colors[i])
+    }
     
     # Add to legend data
-    legend_colors <- c(legend_colors, colors[i])
-    legend_labels <- c(legend_labels, labels[i])
+    #legend_colors <- c(legend_colors, colors[i])
+    #legend_labels <- c(legend_labels, labels[i])
+    
   }
   
   # Add legend
-  legend("topright", legend = legend_labels, fill = legend_colors, 
-         cex = 0.8, bty = "n", border = NA)
+  #legend("topright", legend = legend_labels, fill = legend_colors, 
+         #cex = 0.8, bty = "n", border = NA)
 }
+    
 
 # Example usage:
 # Create a list of gamma matrices to compare
-gamma1 <- matrix(c(1, 0.5, 0.2, 1)*-1, nrow = 2)
-gamma2 <- matrix(c(1, 0.8, 0.4, 1)*-1, nrow = 2)
-gamma3 <- matrix(c(1, 0.3, 0.7, 1)*-1, nrow = 2)
+#gamma1 <- matrix(c(1, 0.5, 0.5, 1)*-1, nrow = 2)
+#gamma2 <- matrix(c(1, 0.8, 0.4, 1)*-1, nrow = 2)
+#gamma3 <- matrix(c(1, 0.3, 0.7, 1)*-1, nrow = 2)
 # 
 # # Draw multiple cones
-draw_multiple_cones(
-list(gamma1, gamma2, gamma3),
-labels = c("Low competition", "Medium competition", "High competition")
-)
+#draw_multiple_cones(
+#  list(gamma1, gamma2, gamma3),
+# labels = c("Low competition", "Medium competition", "High competition"))
 
 
