@@ -20,7 +20,7 @@ par(mar = c(3, 3, 1.5, 1.5))  # Set margins
 
 #read data 
 #Hallet et al. 2018 ELE (https://onlinelibrary.wiley.com/doi/10.1111/ele.13341)
-d1 <- read.table(file = "data/avena_erodium_data.csv", header=T, sep=",")
+d1 <- read.table(file = "data/avena_erodium_data.csv", header=T, sep=";")
 
 # calculate the feasiblity domain for the average environment 
 
@@ -593,7 +593,7 @@ plot_c_wet
 #12% of years were late-season dry, 
 #26% of years were consistent wet. 
 
-weights <- c(0.5, 0.12, 0.12, 0.26)  # The weights for each value
+weights <- c(0.49586778, 0.1157025, 0.1239669, 0.2644628)  # The weights for each value
 
 # average versus relative non-linearity in the lambdas----
 #draw the cone
@@ -652,7 +652,7 @@ matrices_list <- list(A_c_dry, A_esf_dry, A_lsp_dry, A_c_wet)
 
 # Calculate weighted average
 weighted_matrix <- weighted_average_matrices(matrices_list, weights)
-weighted_matrix[1,2]<-0
+#weighted_matrix[1,2]<-0
 
 # Display the result
 print(result_matrix)
