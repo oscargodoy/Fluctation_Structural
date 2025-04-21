@@ -50,7 +50,7 @@ draw_biodiversity_cone <- function(gamma) {
   
   # Draw the main biodiversity cone
   draw.sector(start_angle, end_angle, clock.wise = FALSE, 
-              col = adjustcolor("green3", alpha = 0.3), border = "green", lwd=2)
+              col = adjustcolor("green3", alpha = 0.3), border = "orange3", lwd=2)
   
   # Draw axes
   lines(c(-0.2, 1), c(0, 0), lwd = 1)
@@ -145,7 +145,7 @@ draw_multiple_cones <- function(gamma_list, colors = NULL, labels = NULL, show_s
     
     # Draw this cone
     draw.sector(start_angle, end_angle, clock.wise = FALSE, 
-                col = adjustcolor(colors[i], alpha = 0.3), border = "green", lwd=2)
+                col = adjustcolor(colors[i], alpha = 0.3), border = randomColor(), lwd=2)
   
     # Add cone size label if requested
     if(show_sizes) {

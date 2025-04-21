@@ -40,6 +40,8 @@ A[2,2] <-unlist(alphaii_erodium)
 A[1,2] <-unlist(alphaij_avena)
 A[2,1] <-unlist(alphaij_erodium)
 
+
+
 #we multiply by -1 as competition should be negative 
 A <- A*-1
 
@@ -54,7 +56,7 @@ text(0.8, 1, "A. Average conditions", cex = 1.2, pos = 1)
 
 # Hallet relative non-linearity in the lambdas----
 
-d1 <- read.table(file = "data/avena_erodium_data.csv", header=T, sep=",")
+d1 <- read.table(file = "data/avena_erodium_data.csv", header=T, sep=";")
 
 c_dry <-subset(d1, treatment=="Consistent dry")
 esf_dry <-subset(d1, treatment=="Early season fall dry")
@@ -65,31 +67,77 @@ c_wet <-subset(d1, treatment=="Consistent wet")
 #Consistent dry
 r_c_dry <- as.numeric(c_dry$lambda_mean)
 r_c_dry_error <- as.numeric(c_dry$lambda_se)
-A_c_dry <- as.matrix(c_dry[,6:7])*-1
-A_c_dry_error <- as.matrix(c_dry[,8:9])*-1
-#A_c_dry[1,2] <- 0 #for visualization
+
+A_c_dry <-matrix(data =NA, nrow = 2, ncol = 2)
+A_c_dry_error <-matrix(data =NA, nrow = 2, ncol = 2)
+
+A_c_dry[1,1] <-c_dry[1,6]*-1
+A_c_dry[2,2] <-c_dry[2,6]*-1
+A_c_dry[1,2] <-c_dry[1,7]*-1
+A_c_dry[2,1] <-c_dry[2,7]*-1
+
+A_c_dry_error[1,1] <-c_dry[1,8]*-1
+A_c_dry_error[2,2] <-c_dry[2,8]*-1
+A_c_dry_error[1,2] <-c_dry[1,9]*-1
+A_c_dry_error[2,1] <-c_dry[2,9]*-1
+
 #Early season fall dry
 r_esf_dry <- as.numeric(esf_dry$lambda_mean)
 r_esf_dry_error <- as.numeric(esf_dry$lambda_se)
-A_esf_dry <- as.matrix(esf_dry[,6:7])*-1
-A_esf_dry_error <- as.matrix(esf_dry[,8:9])*-1
+
+A_esf_dry <-matrix(data =NA, nrow = 2, ncol = 2)
+A_esf_dry_error <-matrix(data =NA, nrow = 2, ncol = 2)
+
+A_esf_dry[1,1]<-esf_dry[1,6]*-1
+A_esf_dry[2,2]<-esf_dry[2,6]*-1
+A_esf_dry[1,2]<-esf_dry[1,7]*-1
+A_esf_dry[2,1]<-esf_dry[2,7]*-1
+
+A_esf_dry_error[1,1]<-esf_dry[1,8]*-1
+A_esf_dry_error[2,2]<-esf_dry[2,8]*-1
+A_esf_dry_error[1,2]<-esf_dry[1,9]*-1
+A_esf_dry_error[2,1]<-esf_dry[2,9]*-1
+
 #Late season spring dry
 r_lsp_dry <- as.numeric(lsp_dry$lambda_mean)
 r_lsp_dry_error <- as.numeric(lsp_dry$lambda_se)
-A_lsp_dry <- as.matrix(lsp_dry[,6:7])*-1
-A_lsp_dry_error <- as.matrix(lsp_dry[,8:9])*-1
+
+A_lsp_dry <-matrix(data =NA, nrow = 2, ncol = 2)
+A_lsp_dry_error <-matrix(data =NA, nrow = 2, ncol = 2)
+
+A_lsp_dry[1,1]<-lsp_dry[1,6]*-1
+A_lsp_dry[2,2]<-lsp_dry[2,6]*-1
+A_lsp_dry[1,2]<-lsp_dry[1,7]*-1
+A_lsp_dry[2,1]<-lsp_dry[2,7]*-1
+
+A_lsp_dry_error[1,1]<-lsp_dry[1,8]*-1
+A_lsp_dry_error[2,2]<-lsp_dry[2,8]*-1
+A_lsp_dry_error[1,2]<-lsp_dry[1,9]*-1
+A_lsp_dry_error[2,1]<-lsp_dry[2,9]*-1
+
 #Consistent wet
 r_c_wet <- as.numeric(c_wet$lambda_mean)
 r_c_wet_error <- as.numeric(c_wet$lambda_se)
-A_c_wet <- as.matrix(c_wet[,6:7])*-1
-A_c_wet_error <- as.matrix(c_wet[,8:9])*-1
+
+A_c_wet <-matrix(data =NA, nrow = 2, ncol = 2)
+A_c_wet_error <-matrix(data =NA, nrow = 2, ncol = 2)
+
+A_c_wet[1,1]<-c_wet[1,6]*-1
+A_c_wet[2,2]<-c_wet[2,6]*-1
+A_c_wet[1,2]<-c_wet[1,7]*-1
+A_c_wet[2,1]<-c_wet[2,7]*-1
+
+A_c_wet_error[1,1]<-c_wet[1,8]*-1
+A_c_wet_error[2,2]<-c_wet[2,8]*-1
+A_c_wet_error[1,2]<-c_wet[1,9]*-1
+A_c_wet_error[2,1]<-c_wet[2,9]*-1
 
 #plot it 
 
 #draw the cone
 draw_biodiversity_cone(A)
 text(0.8, 1, "B. Relative non-linearity in the lambdas", cex = 1.2, pos = 1)
-#draw the vector Consistently dry
+#draw the vector Consistent dry
 point <-r_c_dry/sqrt(sum(r_c_dry^2))
 arrows(0, 0, x1 = point[1], y1 = point[2], length = 0.15, angle = 30,
        code = 2, col = "brown", lty =1, lwd=2)
@@ -107,12 +155,48 @@ arrows(0, 0, x1 = point[1], y1 = point[2], length = 0.15, angle = 30,
        code = 2, col = "brown", lty =1, lwd=2)
 text(point[1] + 0.05, point[2] + 0.07, "Spring dry", cex = 1.2, pos = 1)
 
-#draw the vector Consistently wet
+#draw the vector Consistent wet
 point <-r_c_wet/sqrt(sum(r_c_wet^2))
 arrows(0, 0, x1 = point[1], y1 = point[2], length = 0.15, angle = 30,
        code = 2, col = "brown", lty =1, lwd=2)
 text(point[1] + 0.05, point[2] + 0.07, "Consistent wet", cex = 1.2, pos = 1)
 
+
+#Draw each cone and vector for each environment
+#Consistent dry
+#draw the cone
+draw_biodiversity_cone(A_c_dry)
+#draw the vector
+point <-r_c_dry/sqrt(sum(r_c_dry^2))
+arrows(0, 0, x1 = point[1], y1 = point[2], length = 0.15, angle = 30,
+       code = 2, col = "brown", lty =1, lwd=2)
+text(0.8, 1, "Consistent dry", cex = 1.2, pos = 1)
+
+#Early season fall dry
+#draw the cone
+draw_biodiversity_cone(A_esf_dry)
+#draw the vector
+point <-r_esf_dry/sqrt(sum(r_esf_dry^2))
+arrows(0, 0, x1 = point[1], y1 = point[2], length = 0.15, angle = 30,
+       code = 2, col = "brown", lty =1, lwd=2)
+text(0.8, 1, "Early season fall dry", cex = 1.2, pos = 1)
+
+#Late season spring dry
+draw_biodiversity_cone(A_lsp_dry)
+#draw the vector
+point <-r_lsp_dry/sqrt(sum(r_lsp_dry^2))
+arrows(0, 0, x1 = point[1], y1 = point[2], length = 0.15, angle = 30,
+       code = 2, col = "brown", lty =1, lwd=2)
+text(0.8, 1, "Late season spring dry", cex = 1.2, pos = 1)
+
+#Consistent wet
+#Late season spring dry
+draw_biodiversity_cone(A_c_wet)
+#draw the vector
+point <-r_c_wet/sqrt(sum(r_c_wet^2))
+arrows(0, 0, x1 = point[1], y1 = point[2], length = 0.15, angle = 30,
+       code = 2, col = "brown", lty =1, lwd=2)
+text(0.8, 1, "Consistent wet", cex = 1.2, pos = 1)
 
 # Hallet relative non-linearity in the alphas----
 #draw the cone
