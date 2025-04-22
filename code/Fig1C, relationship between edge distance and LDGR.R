@@ -15,6 +15,7 @@ source("code/R_toolbox/figs/InformationField.R")
 
 source("code/R_toolbox/LDGR.R")
 source("code/R_toolbox/calculate_distance_to_border_2sp.R")
+source("code/R_toolbox/relative_distances_to_centroid_2sp.R")
 
 # load libraries
 #devtools::install_github("MITEcology/feasibility_analysis")
@@ -23,26 +24,13 @@ library(anisoFun)
 
 # load data
 A <-matrix(data =NA, nrow = 2, ncol = 2)
-A[1,1] <- -0.75
-A[2,2] <- -0.75
-A[1,2] <- -0.25
-A[2,1] <- -0.25
+A[1,1] <- -0.95
+A[2,2] <- -0.95
+A[1,2] <- -0.45
+A[2,1] <- -0.45
 
-# 2. Plot the cone without labels 
-drawCircleCones(A, allCones = TRUE, drawLabels = FALSE)
-r1 <- c(2.5,1)
-ra <- r1[1]
-rb <- r1[2]
 
-#normalize the r vectors and add the arrow
-point1 <-r1/sqrt(sum(r1^2))
-points(point1[1], point1[2], pch=19, col="red", cex=0.75)
-arrows(0, 0, x1 = point1[1], y1 = point1[2], length = 0.05, angle = 30,
-       code = 2, col = par("fg"), lty = 2,
-       lwd = par("lwd"))
-text(x=point1[1]+0.05, y=point1[2]+0.04, "A", cex=0.7)
-
-# Additional function to study impact of varying vectors of instrinsic growth rate on LDGR and distance to the edge
+# Additional function to study impact of varying vectors of intrinsic growth rate on LDGR and distance to the edge
 study_parameter_space <- function(ra_range, rb_range, alpha11, alpha22, alpha12, alpha21) {
   n <- length(ra_range)
   m <- length(rb_range)
@@ -104,15 +92,20 @@ param_space <- study_parameter_space(ra_range, rb_range, alpha11, alpha22, alpha
 # Create a matrix of outcomes
 outcome_matrix <- matrix(NA, nrow = length(param_space$ra_range), ncol = length(param_space$rb_range))
 
+# Create a matrix of outcomes
+outcome_matrix_rel <- matrix(NA, nrow = length(param_space$ra_range), ncol = length(param_space$rb_range))
+
 #computing distances to the edge for a given matrix but variability in the intrinsic growth rates
 for (i in 1:length(param_space$ra_range)) {
   for (j in 1:length(param_space$rb_range)) {
     X <- calculate_distance_to_border_2sp(A, c(param_space$ra_range[i], param_space$rb_range[j]))
+    Y <- relative_distances_to_centroid_2sp(A, c(param_space$ra_range[i], param_space$rb_range[j]))
     outcome_matrix[i,j] <- X[[1]]
+    outcome_matrix_rel[i,j] <- Y[[1]]
   }
 }
 
-#Plot the outcome
+#Plot the outcome of LDGR versus distance to the edge 
 # Set theme for consistent, clean appearance
 library(ggplot2)
 
@@ -170,6 +163,68 @@ ggplot(df_long, aes(x = distance, y = log_value, color = parameter, shape = para
   ) +
   # Set consistent plot dimensions
   coord_cartesian(xlim = c(-0.05, 0.5), ylim = c(-0.3, 1.5))
+
+# Doing the same for relative distances to the centroid.----
+
+# Set theme for consistent, clean appearance
+library(ggplot2)
+
+# Create a data frame for plotting
+df <- data.frame(
+  distance = outcome_matrix_rel[,1],
+  lambda1 = log(param_space$lambda1_matrix[,1]),
+  lambda2 = log(param_space$lambda2_matrix[,1])
+)
+
+# Convert to long format for easier plotting
+df_long <- reshape2::melt(df, id.vars = "distance", 
+                          variable.name = "parameter", 
+                          value.name = "log_value")
+
+# Create enhanced plot
+ggplot(df_long, aes(x = distance, y = log_value, color = parameter, shape = parameter)) +
+  # Add points with better size and transparency
+  geom_point(size = 3, alpha = 0.7) +
+  # Add reference lines with better styling
+  geom_vline(xintercept = 1, linetype = "dashed", color = "darkgray", size = 0.7) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "darkgray", size = 0.7) +
+  # Add annotations for regions
+  annotate("text", x = 0.7, y = 0.5, label = "Mutual invasibility", 
+           fontface = "bold", size = 4.5) +
+  annotate("text", x = 1.05, y = 0.7, label = "Exclusion", 
+           fontface = "bold", angle = 90, size = 4.5) +
+  # Add regression lines to help visualize trends
+  geom_smooth(method = "loess", se = FALSE, linetype = "solid", alpha = 0.7, size = 1) +
+  # Set colors with a better palette
+  scale_color_manual(values = c("lambda1" = "#0072B2", "lambda2" = "#D55E00"),
+                     labels = c("Superior competitor", "Inferior competitor")) +
+  scale_shape_manual(values = c(16, 16),
+                     labels = c("Superior competitor", "Inferior competitor")) +
+  # Improve labels and title
+  labs(
+    x = "Relative distance to the centroid",
+    y = "Low Density Growth Rate (log scale)",
+    title = "Structural Stability and Low Density Growth Rate",
+    color = "Parameter",
+    shape = "Parameter"
+  ) +
+  # Set plot theme for better appearance
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(size = 11, color = "darkgray"),
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold"),
+    panel.grid.minor = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.border = element_rect(color = "gray80", fill = NA),
+    axis.title = element_text(face = "bold"),
+    axis.text = element_text(size = 11)
+  ) +
+  # Set consistent plot dimensions
+  coord_cartesian(xlim = c(0.1, 2.5), ylim = c(-0.3, 1.5))
+
+
 
 
 
