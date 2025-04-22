@@ -24,10 +24,10 @@ library(anisoFun)
 
 # load data
 A <-matrix(data =NA, nrow = 2, ncol = 2)
-A[1,1] <- -0.95
-A[2,2] <- -0.95
-A[1,2] <- -0.45
-A[2,1] <- -0.45
+A[1,1] <- -0.5
+A[2,2] <- -0.5
+A[1,2] <- -0.35
+A[2,1] <- -0.35
 
 
 # Additional function to study impact of varying vectors of intrinsic growth rate on LDGR and distance to the edge
@@ -99,7 +99,7 @@ outcome_matrix_rel <- matrix(NA, nrow = length(param_space$ra_range), ncol = len
 for (i in 1:length(param_space$ra_range)) {
   for (j in 1:length(param_space$rb_range)) {
     X <- calculate_distance_to_border_2sp(A, c(param_space$ra_range[i], param_space$rb_range[j]))
-    Y <- relative_distances_to_centroid_2sp(A, c(param_space$ra_range[i], param_space$rb_range[j]))
+    Y <- relative_distances_to_centroid_2sp(A, c(param_space$ra_range[i], param_space$rb_range[j]), norm = "yes")
     outcome_matrix[i,j] <- X[[1]]
     outcome_matrix_rel[i,j] <- Y[[1]]
   }
@@ -162,7 +162,7 @@ ggplot(df_long, aes(x = distance, y = log_value, color = parameter, shape = para
     axis.text = element_text(size = 11)
   ) +
   # Set consistent plot dimensions
-  coord_cartesian(xlim = c(-0.05, 0.5), ylim = c(-0.3, 1.5))
+  coord_cartesian(xlim = c(-0.05, 3.5), ylim = c(-0.3, 1.5))
 
 # Doing the same for relative distances to the centroid.----
 
