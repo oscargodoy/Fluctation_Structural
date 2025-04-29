@@ -56,8 +56,8 @@ calculate_distance_to_edge <- function(r1, r2, alpha11, alpha12, alpha21, alpha2
   
   # Calculate the equilibrium values (N1*, N2*)
   det <- alpha11 * alpha22 - alpha12 * alpha21
-  N1_star <- (r1 * alpha22 - r2 * alpha12) / det
-  N2_star <- (r2 * alpha11 - r1 * alpha21) / det
+  N2_star <- (r1 * alpha21 - r2 * alpha11) / det
+  N1_star <- (-r1 - N2_star * alpha12) /  alpha11
   
   # Check if point is in feasibility domain (both N1* and N2* > 0)
   if (N1_star > 0 && N2_star > 0) {
