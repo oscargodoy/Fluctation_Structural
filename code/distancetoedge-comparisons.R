@@ -7,6 +7,7 @@ library(reshape2)
 # Function implementations
 # First method - calculate_distance_to_border_2sp
 # This is Oscar's initial version - focused on the angle
+# prueba commit 
 
 calculate_distance_to_border_2sp <- function(A_int, r, norm = "no"){
   norm_vec <- function(x){
