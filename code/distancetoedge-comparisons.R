@@ -1,13 +1,19 @@
+#%%
+rm (list = ls()) 
 # Load necessary libraries
 library(ggplot2)
 library(dplyr)
 library(gridExtra)
 library(reshape2)
 
-# Function implementations
+# Function implementations for a 2-species Lotka-Volterra model: 
+# d N_1 / dt = r1 * N_1 * (1 + N_1 / alpha11 + N_2 / alpha12)
+# d N_2 / dt = r2 * N_2 * (1 + N_2 / alpha22 + N_1 / alpha21)
+# where r_1 and r_2 are the growth rates of species 1 and 2, respectively,
+# with competitive interactions as negative values (alpha parameters)
+
 # First method - calculate_distance_to_border_2sp
 # This is Oscar's initial version - focused on the angle
-# prueba commit 
 
 calculate_distance_to_border_2sp <- function(A_int, r, norm = "no"){
   norm_vec <- function(x){
@@ -15,7 +21,7 @@ calculate_distance_to_border_2sp <- function(A_int, r, norm = "no"){
   }
   
   arc_length <- function(a, b) {
-    acos(sum(a * b))
+    return(acos(sum(a * b)))
   }
   
   if(length(r) != 2 || length(A_int) != 4){
@@ -36,9 +42,9 @@ calculate_distance_to_border_2sp <- function(A_int, r, norm = "no"){
     
     if(norm == "yes"){
       distance_norm <- distance / pi
-      return(list(distance_norm,outside))
+      return(list(distance = distance, outside = outside))
     } else if(norm == "no"){
-      return(list(distance,outside))
+      return(list(distance = distance, outside = outside))
     } else {
       cat("Norm only takes values yes and no. \n")
     }
@@ -46,79 +52,48 @@ calculate_distance_to_border_2sp <- function(A_int, r, norm = "no"){
 }
 
 # Second method - calculate_distance_to_edge
-# This is Lauren and Claude's version
+# This is Lauren and Claude's version, checked by Violeta
 # Focused on Eucidean distances
 # Need to confirm that distance is being calculated as the shortest path to the feasibility domain
 
 calculate_distance_to_edge <- function(r1, r2, alpha11, alpha12, alpha21, alpha22) {
   # Calculate the slopes of the boundaries
-  left_slope <- alpha22 / alpha12
-  right_slope <- alpha21 / alpha11
+  slope_sp1edge <- alpha22 / alpha12
+  slope_sp2edge <- alpha21 / alpha11
   
   # Calculate the equilibrium values (N1*, N2*)
   det <- alpha11 * alpha22 - alpha12 * alpha21
   N2_star <- (r1 * alpha21 - r2 * alpha11) / det
-  N1_star <- (-r1 - N2_star * alpha12) /  alpha11
+  N1_star <- (r2 * alpha12 - r1 * alpha22) /  det
+
+  # Calculate distances to both boundaries
+  # We'll use the perpendicular distance from point (r1, r2) to each boundary line
+  
+  # For the extinction edge of species 1 (with slope slope_sp1edge)
+  # Line equation: r2 =  slope_sp1edge * r1
+  dist_sp1edge <- abs(r2 - slope_sp1edge * r1) / sqrt(1 + slope_sp1edge^2)
+  
+  # For the extinction edge of species 2 (with slope slope_sp2edge)
+  # Line equation: r2 = slope_sp2edge * r1
+  dist_sp2edge <- abs(r2 - slope_sp2edge * r1) / sqrt(1 + slope_sp2edge^2)
   
   # Check if point is in feasibility domain (both N1* and N2* > 0)
   if (N1_star > 0 && N2_star > 0) {
     # Inside the feasibility domain
-    # Calculate distances to both boundaries and return the minimum
-    # We'll use the perpendicular distance from point (r1, r2) to each boundary line
     
-    # For the left boundary (with slope left_slope)
-    # Line equation: r2 = left_slope * r1
-    # Distance formula: |r2 - left_slope * r1| / sqrt(1 + left_slope^2)
-    dist_left <- abs(r2 - left_slope * r1) / sqrt(1 + left_slope^2)
-    
-    # For the right boundary (with slope right_slope)
-    # Line equation: r2 = right_slope * r1
-    # Distance formula: |r2 - right_slope * r1| / sqrt(1 + right_slope^2)
-    dist_right <- abs(r2 - right_slope * r1) / sqrt(1 + right_slope^2)
-    
-    # Return the minimum distance to any boundary
-    return(min(dist_left, dist_right))
+    # Return the minimum distance to any boundary as the community distance
+    community_distance <- min(dist_sp1edge, dist_sp2edge)
+    return(list(dist_sp1edge = dist_sp1edge,dist_sp2edge = dist_sp2edge,community_distance = community_distance))
+
   } else {
     # Outside the feasibility domain
-    # Calculate the distance as negative
-    # First, determine which boundary is closest
-    
-    # Calculate closest point on left boundary
-    if (left_slope == 0) {
-      # If left boundary is horizontal
-      closest_left <- c(r1, 0)
-    } else if (is.infinite(left_slope)) {
-      # If left boundary is vertical
-      closest_left <- c(0, r2)
-    } else {
-      # General case
-      # Closest point on line r2 = left_slope * r1 is given by:
-      x <- (r1 + left_slope * r2) / (1 + left_slope^2)
-      y <- left_slope * x
-      closest_left <- c(x, y)
-    }
-    
-    # Calculate closest point on right boundary
-    if (right_slope == 0) {
-      # If right boundary is horizontal
-      closest_right <- c(r1, 0)
-    } else if (is.infinite(right_slope)) {
-      # If right boundary is vertical
-      closest_right <- c(0, r2)
-    } else {
-      # General case
-      # Closest point on line r2 = right_slope * r1 is given by:
-      x <- (r1 + right_slope * r2) / (1 + right_slope^2)
-      y <- right_slope * x
-      closest_right <- c(x, y)
-    }
-    
-    # Calculate distances to both closest points
-    dist_left <- sqrt((r1 - closest_left[1])^2 + (r2 - closest_left[2])^2)
-    dist_right <- sqrt((r1 - closest_right[1])^2 + (r2 - closest_right[2])^2)
-    
-    # Return the negative of the minimum distance
-    return(-min(dist_left, dist_right))
+    # Calculate the distance of the species that is outside as negative
+    dist_sp1edge <- sign(N1_star) * dist_sp1edge
+    dist_sp2edge <- sign(N2_star) * dist_sp2edge
+    # Return the negative of the minimum distance as the community distance
+    community_distance <- - min(dist_sp1edge, dist_sp2edge)
+    return(list(dist_sp1edge = dist_sp1edge,dist_sp2edge = dist_sp2edge,community_distance = community_distance))
+
   }
 }
 
@@ -127,19 +102,19 @@ calculate_distance_method1 <- function(r1, r2, alpha11, alpha12, alpha21, alpha2
   A_int <- matrix(c(alpha11, alpha21, alpha12, alpha22), nrow=2)
   r <- c(r1, r2)
   result <- calculate_distance_to_border_2sp(A_int, r)
-  return(result[[1]])
+  return(result$distance)
 }
 
 # LDGR calculation function
 calculate_ldgr <- function(r1, r2, alpha11, alpha12, alpha21, alpha22) {
   # Calculate equilibrium densities when each species is alone
-  N1_alone <- r1 / alpha11  # Equilibrium of species 1 when alone
-  N2_alone <- r2 / alpha22  # Equilibrium of species 2 when alone
+  N1_alone <- - r1 / alpha11  # Equilibrium of species 1 when alone
+  N2_alone <- - r2 / alpha22  # Equilibrium of species 2 when alone
   
-  # Calculate LDGR for species 1 (when introduced to equilibrium of species 2)
+  # Calculate LDGR for species 1 (when introduced to the equilibrium of species 2)
   LDGR1 <- r1 - alpha12 * N2_alone
   
-  # Calculate LDGR for species 2 (when introduced to equilibrium of species 1)
+  # Calculate LDGR for species 2 (when introduced to the equilibrium of species 1)
   LDGR2 <- r2 - alpha21 * N1_alone
   
   return(list(LDGR1 = LDGR1, LDGR2 = LDGR2))
@@ -159,8 +134,13 @@ analyze_coexistence <- function(r1, r2, alpha11, alpha12, alpha21, alpha22) {
   min_LDGR <- min(LDGR1, LDGR2)
   
   # Calculate the slopes of the feasibility domain boundaries
-  left_slope <- alpha22 / alpha12
-  right_slope <- alpha21 / alpha11
+  slope_sp1edge <- alpha22 / alpha12
+  slope_sp2edge <- alpha21 / alpha11
+
+  # Calculate equilibrium densities
+  det <- alpha11 * alpha22 - alpha12 * alpha21
+  N2_star <- (r1 * alpha21 - r2 * alpha11) / det
+  N1_star <- (r2 * alpha12 - r1 * alpha22) /  det
   
   # Return results
   return(data.frame(
@@ -175,9 +155,12 @@ analyze_coexistence <- function(r1, r2, alpha11, alpha12, alpha21, alpha22) {
     LDGR1 = LDGR1,
     LDGR2 = LDGR2,
     min_LDGR = min_LDGR,
-    left_slope = left_slope,
-    right_slope = right_slope,
-    coexistence = (LDGR1 > 0 & LDGR2 > 0)
+    slope_sp1edge = slope_sp1edge,
+    slope_sp2edge = slope_sp2edge,
+    coexistence_LDGR = (LDGR1 > 0 & LDGR2 > 0),
+    coexistence_Nstar = (N1_star > 0 & N2_star > 0),
+    N1_star = N1_star,
+    N2_star = N2_star
   ))
 }
 
@@ -366,7 +349,7 @@ run_parameter_sweep <- function() {
 set.seed(42)
 all_results <- run_parameter_sweep()
 
-#################################################
+#%% ################################################
 # Create plots for each scenario
 #################################################
 
@@ -387,7 +370,7 @@ create_scenario_plots <- function(data, scenario_name, varying_param) {
     theme_minimal()  + geom_vline(xintercept = 0)
   
   # Plot for Method 2 vs. LDGR
-  p2 <- ggplot(scenario_data, aes(x=min_LDGR, y=distance2, color=!!sym(varying_param))) +
+  p2 <- ggplot(scenario_data, aes(x=min_LDGR, y=distance2.community_distance, color=!!sym(varying_param))) +
     geom_point(size=3) +
     geom_path(aes(group=1), color="grey50", alpha=0.5) +
     geom_hline(yintercept=0, linetype="dashed", color="red") +
@@ -400,7 +383,7 @@ create_scenario_plots <- function(data, scenario_name, varying_param) {
   
   # Create parameter vs. metrics plot
   p3 <- scenario_data %>%
-    select(!!sym(varying_param), min_LDGR, distance1, distance2) %>%
+    select(!!sym(varying_param), min_LDGR, distance1, distance2.community_distance) %>%
     reshape2::melt(id.vars = varying_param) %>%
     ggplot(aes(x=!!sym(varying_param), y=value, color=variable)) +
     geom_line(size=1) +
@@ -463,11 +446,11 @@ analyze_scenario_relationships <- function(data) {
     
     # Calculate correlations
     cor_minLDGR_dist1 <- cor(scenario_data$min_LDGR, scenario_data$distance1)
-    cor_minLDGR_dist2 <- cor(scenario_data$min_LDGR, scenario_data$distance2)
+    cor_minLDGR_dist2 <- cor(scenario_data$min_LDGR, scenario_data$distance2.community_distance)
     
     # Fit linear models
     lm1 <- lm(distance1 ~ min_LDGR, data=scenario_data)
-    lm2 <- lm(distance2 ~ min_LDGR, data=scenario_data)
+    lm2 <- lm(distance2.community_distance ~ min_LDGR, data=scenario_data)
     
     r2_1 <- summary(lm1)$r.squared
     r2_2 <- summary(lm2)$r.squared
@@ -526,7 +509,8 @@ create_feasibility_plot <- function(alpha11, alpha22, alpha12, alpha21) {
     
     # Calculate distances
     results$distance1[i] <- calculate_distance_method1(r1, r2, alpha11, alpha12, alpha21, alpha22)
-    results$distance2[i] <- calculate_distance_to_edge(r1, r2, alpha11, alpha12, alpha21, alpha22)
+    distance2 <- calculate_distance_to_edge(r1, r2, alpha11, alpha12, alpha21, alpha22)
+    results$distance2[i] <- distance2$community_distance
     
     # Calculate LDGR
     ldgr_res <- calculate_ldgr(r1, r2, alpha11, alpha12, alpha21, alpha22)
@@ -537,16 +521,16 @@ create_feasibility_plot <- function(alpha11, alpha22, alpha12, alpha21) {
   }
   
   # Calculate the slopes of the boundaries
-  left_slope <- alpha22 / alpha12
-  right_slope <- alpha21 / alpha11
+  slope_sp1edge <- alpha22 / alpha12
+  slope_sp2edge <- alpha21 / alpha11
   
   # Create plots
   # Plot 1: Feasibility domain with LDGR contours
   p1 <- ggplot(results, aes(x=r1, y=r2)) +
     geom_tile(aes(fill=min_LDGR)) +
     geom_contour(aes(z=min_LDGR), breaks=0, color="black", linewidth=1) +
-    geom_abline(slope=left_slope, intercept=0, linetype="dashed", color="white") +
-    geom_abline(slope=right_slope, intercept=0, linetype="dashed", color="white") +
+    geom_abline(slope=slope_sp1edge, intercept=0, linetype="dashed", color="white") +
+    geom_abline(slope=slope_sp2edge, intercept=0, linetype="dashed", color="white") +
     scale_fill_gradient2(low="red", mid="white", high="blue", midpoint=0) +
     labs(title="Minimum LDGR in r1-r2 Space",
          subtitle=paste("α11=", alpha11, ", α12=", alpha12, ", α21=", alpha21, ", α22=", alpha22),
@@ -558,8 +542,8 @@ create_feasibility_plot <- function(alpha11, alpha22, alpha12, alpha21) {
   p2 <- ggplot(results, aes(x=r1, y=r2)) +
     geom_tile(aes(fill=distance1)) +
     geom_contour(aes(z=distance1), breaks=0, color="black", linewidth=1) +
-    geom_abline(slope=left_slope, intercept=0, linetype="dashed", color="white") +
-    geom_abline(slope=right_slope, intercept=0, linetype="dashed", color="white") +
+    geom_abline(slope=slope_sp1edge, intercept=0, linetype="dashed", color="white") +
+    geom_abline(slope=slope_sp2edge, intercept=0, linetype="dashed", color="white") +
     scale_fill_gradient2(low="red", mid="white", high="blue", midpoint=0) +
     labs(title="Arc Distance (Method 1) in r1-r2 Space",
          subtitle=paste("α11=", alpha11, ", α12=", alpha12, ", α21=", alpha21, ", α22=", alpha22),
@@ -571,8 +555,8 @@ create_feasibility_plot <- function(alpha11, alpha22, alpha12, alpha21) {
   p3 <- ggplot(results, aes(x=r1, y=r2)) +
     geom_tile(aes(fill=distance2)) +
     geom_contour(aes(z=distance2), breaks=0, color="black", linewidth=1) +
-    geom_abline(slope=left_slope, intercept=0, linetype="dashed", color="white") +
-    geom_abline(slope=right_slope, intercept=0, linetype="dashed", color="white") +
+    geom_abline(slope=slope_sp1edge, intercept=0, linetype="dashed", color="white") +
+    geom_abline(slope=slope_sp2edge, intercept=0, linetype="dashed", color="white") +
     scale_fill_gradient2(low="red", mid="white", high="blue", midpoint=0) +
     labs(title="Euclidean Distance (Method 2) in r1-r2 Space",
          subtitle=paste("α11=", alpha11, ", α12=", alpha12, ", α21=", alpha21, ", α22=", alpha22),
@@ -612,7 +596,7 @@ print(relationship_stats)
 
 # Calculate overall correlations
 overall_cor_minLDGR_dist1 <- cor(all_results$min_LDGR, all_results$distance1)
-overall_cor_minLDGR_dist2 <- cor(all_results$min_LDGR, all_results$distance2)
+overall_cor_minLDGR_dist2 <- cor(all_results$min_LDGR, all_results$distance2.community_distance)
 
 cat("\n\nOverall Correlation between min_LDGR and Arc Distance (Method 1):", overall_cor_minLDGR_dist1)
 cat("\nOverall Correlation between min_LDGR and Euclidean Distance (Method 2):", overall_cor_minLDGR_dist2)
@@ -637,6 +621,7 @@ cat("   - When varying alpha21, Method 2 shows a",
 
 cat("\n3. Effect of varying intraspecific competition (alpha11, alpha22):\n")
 cat("   - When varying alpha11, Method 2 shows a", 
-    relationship_stats$linearity_dist2[relationship
+    relationship_stats$linearity_dist2[relationship_stats$scenario == "varying_alpha11"],
+    "relationship with min_LDGR\n")
                                        
                                        
