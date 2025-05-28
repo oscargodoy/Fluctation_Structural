@@ -636,7 +636,6 @@ cat("   - When varying alpha21, Method 2 shows a",
     "relationship with min_LDGR\n")
 
 cat("\n3. Effect of varying intraspecific competition (alpha11, alpha22):\n")
-cat("   - When varying alpha11, Method 2 shows a", 
-    relationship_stats$linearity_dist2[relationship
+
                                        
                                        
