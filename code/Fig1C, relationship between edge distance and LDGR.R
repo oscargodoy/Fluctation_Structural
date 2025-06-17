@@ -24,10 +24,16 @@ library(anisoFun)
 
 # load data
 A <-matrix(data =NA, nrow = 2, ncol = 2)
-A[1,1] <- -0.5
-A[2,2] <- -0.5
-A[1,2] <- -0.35
-A[2,1] <- -0.35
+A[1,1] <- -0.75
+A[2,2] <- -0.75
+A[1,2] <- -0.25
+A[2,1] <- -0.25
+
+alpha11 <- A[1,1]
+alpha22 <- A[2,2]
+alpha12 <- A[1,2]
+alpha21 <- A[2,1]
+
 
 
 # Additional function to study impact of varying vectors of intrinsic growth rate on LDGR and distance to the edge
@@ -129,9 +135,9 @@ ggplot(df_long, aes(x = distance, y = log_value, color = parameter, shape = para
   geom_vline(xintercept = 0, linetype = "dashed", color = "darkgray", size = 0.7) +
   geom_hline(yintercept = 0, linetype = "dashed", color = "darkgray", size = 0.7) +
   # Add annotations for regions
-  annotate("text", x = 0.15, y = 0.5, label = "Mutual invasibility", 
-           fontface = "bold", size = 4.5) +
-  annotate("text", x = -0.025, y = 0.7, label = "Exclusion", 
+  annotate("text", x = 0.025, y = 0.55, label = "Mutual invasibility", 
+           fontface = "bold",angle = 90, size = 4.5) +
+  annotate("text", x = -0.025, y = 0.55, label = "Exclusion", 
            fontface = "bold", angle = 90, size = 4.5) +
   # Add regression lines to help visualize trends
   geom_smooth(method = "loess", se = FALSE, linetype = "solid", alpha = 0.7, size = 1) +
@@ -144,25 +150,24 @@ ggplot(df_long, aes(x = distance, y = log_value, color = parameter, shape = para
   labs(
     x = "Distance to Edge of Feasibility Domain",
     y = "Low Density Growth Rate (log scale)",
-    title = "Structural Stability and Low Density Growth Rate",
-    color = "Parameter",
-    shape = "Parameter"
+    title = "",
+    color = " ",
+    shape = " "
   ) +
   # Set plot theme for better appearance
   theme_minimal() +
   theme(
     plot.title = element_text(face = "bold", size = 14),
     plot.subtitle = element_text(size = 11, color = "darkgray"),
-    legend.position = "bottom",
-    legend.title = element_text(face = "bold"),
+    legend.position = c(0.9,0.75),
     panel.grid.minor = element_blank(),
     panel.grid.major = element_blank(),
     panel.border = element_rect(color = "gray80", fill = NA),
-    axis.title = element_text(face = "bold"),
     axis.text = element_text(size = 11)
   ) +
   # Set consistent plot dimensions
-  coord_cartesian(xlim = c(-0.05, 3.5), ylim = c(-0.3, 1.5))
+  coord_cartesian(xlim = c(-0.05, 0.6), ylim = c(-0.3, 1.5))
+
 
 # Doing the same for relative distances to the centroid.----
 
