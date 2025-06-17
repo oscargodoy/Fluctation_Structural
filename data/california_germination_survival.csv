@@ -1,0 +1,11 @@
+﻿names;species;treatment;survival;germination
+Avena_fatua;AVFA;wet;0.11;0.56
+Avena_fatua;AVFA;dry;0.11;0.56
+Bromus_hordeaceus;BRHO;wet;0.02;0.93
+Bromus_hordeaceus;BRHO;dry;0.02;0.93
+Vulpia_myuros;VUMY;wet;0.01;0.6
+Vulpia_myuros;VUMY;dry;0.01;0.6
+Lasthenia_californica;LACA;wet;0.01;0.20
+Lasthenia_californica;LACA;dry;0.01;0.20
+Eschscholzia_californica;ESCA;wet;0.02;0.92
+Eschscholzia_californica;ESCA;dry;0.02;0.92
