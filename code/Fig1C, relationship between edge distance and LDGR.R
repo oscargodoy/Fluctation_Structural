@@ -15,7 +15,7 @@ source("code/R_toolbox/figs/InformationField.R")
 
 source("code/R_toolbox/LDGR.R")
 source("code/R_toolbox/calculate_distance_to_border_2sp.R")
-source("code/R_toolbox/relative_distances_to_centroid_2sp.R")
+source("code/R_toolbox/relative_distances_to_incenter_2sp.R")
 
 # load libraries
 #devtools::install_github("MITEcology/feasibility_analysis")
@@ -105,7 +105,7 @@ outcome_matrix_rel <- matrix(NA, nrow = length(param_space$ra_range), ncol = len
 for (i in 1:length(param_space$ra_range)) {
   for (j in 1:length(param_space$rb_range)) {
     X <- calculate_distance_to_border_2sp(A, c(param_space$ra_range[i], param_space$rb_range[j]))
-    Y <- relative_distances_to_centroid_2sp(A, c(param_space$ra_range[i], param_space$rb_range[j]), norm = "yes")
+    Y <- relative_distances_to_incenter_2sp(A, c(param_space$ra_range[i], param_space$rb_range[j]), norm = "yes")
     outcome_matrix[i,j] <- X[[1]]
     outcome_matrix_rel[i,j] <- Y[[1]]
   }
@@ -169,7 +169,7 @@ ggplot(df_long, aes(x = distance, y = log_value, color = parameter, shape = para
   coord_cartesian(xlim = c(-0.05, 0.6), ylim = c(-0.3, 1.5))
 
 
-# Doing the same for relative distances to the centroid.----
+# Doing the same for relative distances to the incenter.----
 
 # Set theme for consistent, clean appearance
 library(ggplot2)
@@ -207,7 +207,7 @@ ggplot(df_long, aes(x = distance, y = log_value, color = parameter, shape = para
                      labels = c("Superior competitor", "Inferior competitor")) +
   # Improve labels and title
   labs(
-    x = "Relative distance to the centroid",
+    x = "Relative distance to the incenter",
     y = "Low Density Growth Rate (log scale)",
     title = "Structural Stability and Low Density Growth Rate",
     color = "Parameter",
