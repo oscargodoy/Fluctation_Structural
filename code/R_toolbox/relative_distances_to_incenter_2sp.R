@@ -1,9 +1,9 @@
-#' Calculate the (arc) relative distance to the centroid of the feasibility domain
+#' Calculate the (arc) relative distance to the incenter of the feasibility domain
 #' 
 #'
-#' @description  the relative distance to the centroid is calculated as the fraction between two distance
-#' One distance is between the vector of intrinsic growth rates and the centroid 
-#' Another distance is calculated between the edge and the centroid. 
+#' @description  the relative distance to the incenter is calculated as the fraction between two distance
+#' One distance is between the vector of intrinsic growth rates and the incenter 
+#' Another distance is calculated between the edge and the incenter. 
 #' 
 #'
 #' @param A_int the interaction matrix
@@ -14,7 +14,7 @@
 #' 
 #' 
 
-relative_distances_to_centroid_2sp <- function(A_int, r, norm = "no"){
+relative_distances_to_incenter_2sp <- function(A_int, r, norm = "no"){
   norm_vec <- function(x){
     return(x/sqrt(sum(x^2)))
   }
@@ -25,9 +25,9 @@ relative_distances_to_centroid_2sp <- function(A_int, r, norm = "no"){
     cat("This function is only for communities of 2 species. \n")
     
   } else {
-    # Calculate centroid of A_int
-    centroid <- rowMeans(A_int)
-    centroid_norm <- - norm_vec(centroid)
+    # Calculate incenter of A_int
+    incenter <- rowMeans(A_int)
+    incenter_norm <- - norm_vec(incenter)
     r_norm <- norm_vec(r)
     A1 <- - norm_vec(A_int[,1])
     A2 <- - norm_vec(A_int[,2])
@@ -35,12 +35,12 @@ relative_distances_to_centroid_2sp <- function(A_int, r, norm = "no"){
     
   
     if(all(aux>0)){     
-      distance_r_rc <- arc_length(r_norm, centroid_norm)
-      distance_edge_rc <- min(arc_length(centroid_norm, A1), arc_length(centroid_norm, A2))
+      distance_r_rc <- arc_length(r_norm, incenter_norm)
+      distance_edge_rc <- min(arc_length(incenter_norm, A1), arc_length(incenter_norm, A2))
       outside <- 0
     } else {        
-      distance_r_rc <- arc_length(r_norm, centroid_norm)
-      distance_edge_rc <- min(arc_length(centroid_norm, A1), arc_length(centroid_norm, A2))
+      distance_r_rc <- arc_length(r_norm, incenter_norm)
+      distance_edge_rc <- min(arc_length(incenter_norm, A1), arc_length(incenter_norm, A2))
       outside <- 1
     }
     
@@ -50,11 +50,11 @@ relative_distances_to_centroid_2sp <- function(A_int, r, norm = "no"){
       relative_distance <- distance_r_rc_norm/distance_edge_rc_norm
       
       return(list(relative_distance=relative_distance, distance_r_rc=distance_r_rc_norm, 
-                  distance_edge_rc=distance_edge_rc_norm, outside=outside, centroid=centroid))
+                  distance_edge_rc=distance_edge_rc_norm, outside=outside, incenter=incenter))
     } else if(norm == "no"){
       relative_distance <- distance_r_rc/distance_edge_rc
       return(list(relative_distance=relative_distance, distance_r_rc=distance_r_rc, 
-                  distance_edge_rc=distance_edge_rc, outside=outside, centroid=centroid))
+                  distance_edge_rc=distance_edge_rc, outside=outside, incenter=incenter))
     } else {
       cat("Norm only takes values yes and no. \n")
     }
