@@ -15,6 +15,7 @@ source("code/R_toolbox/figs/sphereSubCones.R")
 source("code/R_toolbox/figs/InformationField.R")
 source("code/R_toolbox/Functions to plot Muehleisen data.R")
 source("code/R_toolbox/calculate_distance_to_border_2sp.R")
+source("code/R_toolbox/multispecies distance to the edge.r")
 
 par(mar = c(3, 3, 1.5, 1.5))  # Set margins
 # Muehleisen Average conditions----
@@ -24,24 +25,28 @@ d2vr <- read.table(file = "data/california_vital_rates.csv", header=T, sep=",")
 d2int <- read.table(file = "data/california_interactions.csv", header = T, sep = ",") %>%
   select(species, treatment, AVFA, BRHO, ESCA, LACA, VUMY)
 
-# ## Once we have a function for multi-species, use this code
-# vrmean <- d2vr %>%
-#   select(-treatment) %>%
-#   group_by(species) %>%
-#   summarize_all(list(mean = mean)) 
-# 
-# r <- vrmean$nu_mean
-# 
-# intmean <- d2int %>%
-#   select(-treatment) %>%
-#   group_by(species) %>%
-#   summarize_all(list(mean = mean)) %>%
-#   select(species, AVFA_mean, BRHO_mean, ESCA_mean, LACA_mean, VUMY_mean)
-# 
-# A <- as.matrix(intmean[,2:6])
-# 
-# #we multiply by -1 as competition should be negative 
-# A <- A*-1
+## Multispecies coexistence under average conditions
+vrmean <- d2vr %>%
+  select(-treatment) %>%
+  group_by(species) %>%
+  summarize_all(list(mean = mean))
+
+r <- vrmean$nu_mean
+
+intmean <- d2int %>%
+  select(-treatment) %>%
+  group_by(species) %>%
+  summarize_all(list(mean = mean)) %>%
+  select(species, AVFA_mean, BRHO_mean, ESCA_mean, LACA_mean, VUMY_mean)
+
+A <- as.matrix(intmean[,2:6])
+
+#we multiply by -1 as competition should be negative
+A <- A*-1
+
+distout <- Measure_Distances(A, r)
+species <- unique(d2vr$species)
+avgdistout <- data.frame(distout, splist)
 
 
 ## Calculate for every pairwise combination of Muehleisen
@@ -100,3 +105,4 @@ text(0.8, 1, "A. Average conditions", cex = 1.2, pos = 1)
 
 }
 
+pairwise_average
