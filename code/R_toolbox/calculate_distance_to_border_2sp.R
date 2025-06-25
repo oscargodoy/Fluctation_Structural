@@ -40,16 +40,18 @@ if(length(r) != 2 || length(A_int) != 4){
     if(all(aux>0)){     
         distance <- min(arc_length(r_norm,A1),arc_length(r_norm,A2))
         outside <- 0
+        inferior_comp <- paste("sp", which(aux == min(aux)))
     }else {        
         distance <- - min(arc_length(r_norm,A1),arc_length(r_norm,A2))
         outside <- 1
+        inferior_comp <- paste("sp", which(aux == min(aux)))
     }
 
     if(norm == "yes"){
         distance_norm <- distance / pi
-        return(list(distance_norm,outside))
+        return(list(distance_norm,outside, inferior_comp))
     } else if(norm == "no"){
-        return(list(distance,outside))
+        return(list(distance,outside, inferior_comp))
     } else {
         cat("Norm only takes values yes and no. \n")
     }
