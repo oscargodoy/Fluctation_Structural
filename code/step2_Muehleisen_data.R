@@ -20,18 +20,19 @@ source("code/R_toolbox/multispecies distance to the edge.r")
 par(mar = c(3, 3, 1.5, 1.5))  # Set margins
 
 
+# NOTE: dry occurs 62% of the time and wet 38% over the last 50 years (61.2 versus 38.8 in the 100+ timeseries)
+pw <- .38
+pd <- .62
+
 ## READ IN THE MUEHLEISEN DATA
 d2vr <- read.table(file = "data/california_vital_rates.csv", header=T, sep=",") %>%
-  mutate(prop = ifelse(treatment == "dry", .62, .38))
+  mutate(prop = ifelse(treatment == "dry", pd, pw))
 d2int <- read.table(file = "data/california_interactions.csv", header = T, sep = ",") %>%
   select(species, treatment, AVFA, BRHO, ESCA, LACA, VUMY) %>%
-  mutate(prop = ifelse(treatment == "dry", .62, .38))
+  mutate(prop = ifelse(treatment == "dry", pd, pw))
 
-# NOTE: dry occurs 62% of the time and wet 38% over the last 50 years (61.2 versus 38.8 in the 100+ timeseries)
-
-
-######## MULTISPECIES ANALYSIS ######
-## Multispecies - average conditions
+######## MULTISPECIES ANALYSIS ##########
+### Multispecies - average conditions ###
 vrmean <- d2vr %>%
   mutate(nu_weighted = nu*prop) %>%
   group_by(species) %>%
@@ -50,12 +51,11 @@ A_mean <- as.matrix(intmean[,2:6])
 #we multiply by -1 as competition should be negative
 A_mean <- A_mean*-1
 
-distout_m <- Measure_Distances(A_mean, r_mean)
 species <- unique(d2vr$species)
-distout_mean <- data.frame(distout_m, species)
-rm(distout_m)
+distout_mean <- data.frame(Measure_Distances(A_mean, r_mean), species) %>%
+  mutate(distance = ifelse(extinct == 1, -distance, distance))
 
-## Multispecies - dry conditions
+### Multispecies - dry conditions ###
 vrdry <- d2vr %>%
   filter(treatment == "dry")
 
@@ -67,12 +67,12 @@ intdry <- d2int %>%
 
 A_dry <- as.matrix(intdry[,2:6])
 
-#we multiply by -1 as competition should be negative
 A_dry <- A_dry*-1
 
-distout_d <- Measure_Distances(A_dry, r_dry)
-distout_dry <- data.frame(distout_d, species)
-rm(distout_d)
+distout_dry <- data.frame(Measure_Distances(A_dry, r_dry), species) %>%
+  mutate(distance = ifelse(extinct == 1, -distance, distance)) %>%
+  mutate(treatment = "dry", prop = pd)
+
 
 ## Multispecies - wet conditions
 vrwet <- d2vr %>%
@@ -86,16 +86,69 @@ intwet <- d2int %>%
 
 A_wet <- as.matrix(intwet[,2:6])
 
-#we multiply by -1 as competition should be negative
 A_wet <- A_wet*-1
 
-distout_w <- Measure_Distances(A_wet, r_wet)
-distout_wet <- data.frame(distout_w, species)
-rm(distout_w)
+distout_wet <- data.frame(Measure_Distances(A_wet, r_wet), species) %>%
+  mutate(distance = ifelse(extinct == 1, -distance, distance)) %>%
+  mutate(treatment = "wet", prop = pw)
+
+distout_wet
+
+### COEXISTENCE WITH VARIABILITY ###
+distvar <- rbind(distout_wet, distout_dry) %>%
+  mutate(distance_weighted = distance * prop) %>%
+  group_by(species) %>%
+  summarize(dist_withvariability = sum(distance_weighted))
 
 
+### RELATIVE NONLINEARITY IN LAMBDA ###
+# calculate distance of the wet and dry r from the average feasibility domain
+distout_wr_ai <- data.frame(Measure_Distances(A_mean, r_wet), species) %>%
+  mutate(distance = ifelse(extinct == 1, -distance, distance), 
+         propdist = pw*distance)
+names(distout_wr_ai) <- c("distance-wr-ai", "extinct-wr-ai","species", "propdist_wr_ai")
+
+distout_dr_ai <- data.frame(Measure_Distances(A_mean, r_dry), species) %>%
+  mutate(distance = ifelse(extinct == 1, -distance, distance),
+         propdist = pd*distance)
+names(distout_dr_ai) <- c("distance-dr-ai", "extinct-dr-ai","species", "propdist_dr_ai")
+
+wr_dr <- left_join(distout_wr_ai, distout_dr_ai) %>%
+  mutate(dist_onlylambda = propdist_wr_ai + propdist_dr_ai)
 
 
+distout_lambda <- left_join(distout_mean, wr_dr) %>%
+  select(species, distance, dist_onlylambda) %>%
+  mutate(relnonlambda_abs = abs(distance - dist_onlylambda),
+         relnonlambda_directional = ifelse(dist_onlylambda > distance, relnonlambda_abs, -relnonlambda_abs))
+
+
+### RELATIVE NONLINEARITY IN ALPHA ###
+# calculate distance of the wet and dry r from the average feasibility domain
+distout_mr_wi <- data.frame(Measure_Distances(A_wet, r_mean), species) %>%
+  mutate(distance = ifelse(extinct == 1, -distance, distance), 
+         propdist = pw*distance)
+names(distout_mr_wi) <- c("distance-mr-wi", "extinct-mr-wi","species", "propdist_mr_wi")
+
+distout_mr_di <- data.frame(Measure_Distances(A_dry, r_mean), species) %>%
+  mutate(distance = ifelse(extinct == 1, -distance, distance),
+         propdist = pd*distance)
+names(distout_mr_di) <- c("distance-mr-di", "extinct-mr-di","species", "propdist_mr_di")
+
+wi_di <- left_join(distout_mr_wi, distout_mr_di) %>%
+  mutate(dist_onlyalpha = propdist_mr_wi + propdist_mr_di)
+
+
+distout_alpha <- left_join(distout_mean, wi_di) %>%
+  select(species, distance, dist_onlyalpha) %>%
+  mutate(relnonalpha_abs = abs(distance - dist_onlyalpha),
+         relnonalpha_directional = ifelse(dist_onlyalpha > distance, relnonalpha_abs, -relnonalpha_abs))
+
+distout_relnon <- left_join(distout_lambda, distout_alpha) %>%
+  select(-relnonlambda_abs, -relnonalpha_abs)
+
+distout_all <- left_join(distout_relnon, distvar) %>%
+  select(-relnonlambda_directional, -relnonalpha_directional)
 
 
 ## Calculate for every pairwise combination of Muehleisen
