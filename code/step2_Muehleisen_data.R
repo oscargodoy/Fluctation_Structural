@@ -18,35 +18,84 @@ source("code/R_toolbox/calculate_distance_to_border_2sp.R")
 source("code/R_toolbox/multispecies distance to the edge.r")
 
 par(mar = c(3, 3, 1.5, 1.5))  # Set margins
-# Muehleisen Average conditions----
 
 
-d2vr <- read.table(file = "data/california_vital_rates.csv", header=T, sep=",")
+## READ IN THE MUEHLEISEN DATA
+d2vr <- read.table(file = "data/california_vital_rates.csv", header=T, sep=",") %>%
+  mutate(prop = ifelse(treatment == "dry", .62, .38))
 d2int <- read.table(file = "data/california_interactions.csv", header = T, sep = ",") %>%
-  select(species, treatment, AVFA, BRHO, ESCA, LACA, VUMY)
+  select(species, treatment, AVFA, BRHO, ESCA, LACA, VUMY) %>%
+  mutate(prop = ifelse(treatment == "dry", .62, .38))
 
-## Multispecies coexistence under average conditions
+# NOTE: dry occurs 62% of the time and wet 38% over the last 50 years (61.2 versus 38.8 in the 100+ timeseries)
+
+
+######## MULTISPECIES ANALYSIS ######
+## Multispecies - average conditions
 vrmean <- d2vr %>%
-  select(-treatment) %>%
+  mutate(nu_weighted = nu*prop) %>%
   group_by(species) %>%
-  summarize_all(list(mean = mean))
+  summarize(nu_weightedmean = sum(nu_weighted))
 
-r <- vrmean$nu_mean
+r_mean <- vrmean$nu_weightedmean
 
 intmean <- d2int %>%
-  select(-treatment) %>%
+  mutate(AVFA = AVFA*prop, BRHO = BRHO*prop, ESCA = ESCA*prop, LACA = LACA*prop, VUMY = VUMY*prop) %>% 
+  select(-treatment, -prop) %>%
   group_by(species) %>%
-  summarize_all(list(mean = mean)) %>%
-  select(species, AVFA_mean, BRHO_mean, ESCA_mean, LACA_mean, VUMY_mean)
+  summarize_all(list(sum = sum)) 
 
-A <- as.matrix(intmean[,2:6])
+A_mean <- as.matrix(intmean[,2:6])
 
 #we multiply by -1 as competition should be negative
-A <- A*-1
+A_mean <- A_mean*-1
 
-distout <- Measure_Distances(A, r)
+distout_m <- Measure_Distances(A_mean, r_mean)
 species <- unique(d2vr$species)
-avgdistout <- data.frame(distout, splist)
+distout_mean <- data.frame(distout_m, species)
+rm(distout_m)
+
+## Multispecies - dry conditions
+vrdry <- d2vr %>%
+  filter(treatment == "dry")
+
+r_dry <- vrdry$nu
+
+intdry <- d2int %>%
+  filter(treatment == "dry") %>%
+  select(-treatment, -prop)
+
+A_dry <- as.matrix(intdry[,2:6])
+
+#we multiply by -1 as competition should be negative
+A_dry <- A_dry*-1
+
+distout_d <- Measure_Distances(A_dry, r_dry)
+distout_dry <- data.frame(distout_d, species)
+rm(distout_d)
+
+## Multispecies - wet conditions
+vrwet <- d2vr %>%
+  filter(treatment == "wet")
+
+r_wet <- vrwet$nu
+
+intwet <- d2int %>%
+  filter(treatment == "wet") %>%
+  select(-treatment, -prop)
+
+A_wet <- as.matrix(intwet[,2:6])
+
+#we multiply by -1 as competition should be negative
+A_wet <- A_wet*-1
+
+distout_w <- Measure_Distances(A_wet, r_wet)
+distout_wet <- data.frame(distout_w, species)
+rm(distout_w)
+
+
+
+
 
 
 ## Calculate for every pairwise combination of Muehleisen
