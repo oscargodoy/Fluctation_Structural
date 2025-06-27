@@ -51,7 +51,7 @@ avgdistout <- data.frame(distout, splist)
 
 ## Calculate for every pairwise combination of Muehleisen
 
-pairwise_average <- data.frame(species1=character(), species2=character(), de1=numeric(), de2=numeric())
+pairwise_average <- data.frame(species1=character(), species2=character(), de=numeric(), extinct=numeric(), inferior = character())
 # create vector of species
 splist <- unique(d2vr$species)
 
@@ -90,7 +90,7 @@ A <- A*-1
 
 de <- calculate_distance_to_border_2sp(A, r)
 
-tempout <- data.frame(species1= spcomboi[1], species2 = spcomboi[2], de1 = de[[1]][1], de2 = de[[2]][1])
+tempout <- data.frame(species1= spcomboi[1], species2 = spcomboi[2], de = de[[1]][1], extinct = de[[2]][1], inferior = de[[3]][1])
 pairwise_average <- rbind( pairwise_average, tempout)
 
 
