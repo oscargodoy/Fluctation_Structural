@@ -73,6 +73,7 @@ distout_dry <- data.frame(Measure_Distances(A_dry, r_dry), species) %>%
   mutate(distance = ifelse(extinct == 1, -distance, distance)) %>%
   mutate(treatment = "dry", prop = pd)
 
+distout_dry
 
 ## Multispecies - wet conditions
 vrwet <- d2vr %>%
@@ -148,9 +149,66 @@ distout_relnon <- left_join(distout_lambda, distout_alpha) %>%
   select(-relnonlambda_abs, -relnonalpha_abs)
 
 distout_all <- left_join(distout_relnon, distvar) %>%
+  mutate(storage_abs = abs(distance - dist_withvariability),
+         storage_directional = ifelse(dist_withvariability > distance, storage_abs, -storage_abs)) %>%
+  select(-storage_abs) %>%
+  mutate(check = distance + relnonlambda_directional + relnonalpha_directional + storage_directional,
+         check2 = relnonlambda_directional + relnonalpha_directional + storage_directional)
   select(-relnonlambda_directional, -relnonalpha_directional)
 
 
+  
+# ## Calculate for every pairwise combination of Muehleisen
+  
+  pairwise_average <- data.frame(species1=character(), species2=character(), de=numeric(), extinct=numeric(), inferior = character())
+  # create vector of species
+  splist <- unique(d2vr$species)
+  
+  #create matrix of every unique species combo
+  spcombos <- combn(splist, 2)
+  
+  for (i in 1:ncol(spcombos)) {
+    #subset to focal species pairs
+    spcomboi <- spcombos[,i]
+    vrsubmean <- subset(vrmean, species%in%c(spcomboi))
+    intsubmean <- subset(intmean, species%in%c(spcomboi)) %>%
+      pivot_longer(names_to = "competitor", values_to ="value", AVFA_sum:VUMY_sum) %>%
+      separate(competitor, into = c("competitor", "todelete")) %>%
+      select(-todelete) %>%
+      filter(competitor%in%c(spcombos[,i])) %>%
+      pivot_wider(names_from = competitor, values_from = value)
+    
+    
+    # create growth rate vector and interaction matrix
+    r <- vrsubmean$nu_weightedmean
+    A <- as.matrix(intsubmean[,2:3])
+    
+    #we multiply by -1 as competition should be negative
+    A <- A*-1
+    
+    de <- calculate_distance_to_border_2sp(A, r)
+    
+    tempout <- data.frame(species1= spcomboi[1], species2 = spcomboi[2], de = de[[1]][1], extinct = de[[2]][1], superior = de[[3]][1])
+    pairwise_average <- rbind( pairwise_average, tempout)
+    
+    
+    #draw the cone
+    draw_biodiversity_cone(A, spcomboi[1], spcomboi[2])
+    #draw the vector
+    point <-r/sqrt(sum(r^2))
+    arrows(0, 0, x1 = point[1], y1 = point[2], length = 0.15, angle = 30,
+           code = 2, col = "brown", lty =1, lwd=2)
+    text(0.8, 1, "A. Average conditions", cex = 1.2, pos = 1)
+    
+    
+  }
+  
+  pairwise_average
+  
+  
+  
+  
+  
 ## Calculate for every pairwise combination of Muehleisen
 
 pairwise_average <- data.frame(species1=character(), species2=character(), de=numeric(), extinct=numeric(), inferior = character())
