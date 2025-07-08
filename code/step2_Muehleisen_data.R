@@ -209,60 +209,60 @@ distout_all <- left_join(distout_relnon, distvar) %>%
   
   
   
-## Calculate for every pairwise combination of Muehleisen
-
-pairwise_average <- data.frame(species1=character(), species2=character(), de=numeric(), extinct=numeric(), inferior = character())
-# create vector of species
-splist <- unique(d2vr$species)
-
-#create matrix of every unique species combo
-spcombos <- combn(splist, 2)
-
-for (i in 1:ncol(spcombos)) {
-  #subset to focal species pairs
-  spcomboi <- spcombos[,i]
-  vrsub <- subset(d2vr, species%in%c(spcomboi))
-  intsub <- subset(d2int, species%in%c(spcomboi))
-  
-  intsub2 <- intsub %>%
-    pivot_longer(names_to = "competitor", values_to ="value", AVFA:VUMY) %>%
-    filter(competitor%in%c(spcombos[,i])) %>%
-    pivot_wider(names_from = competitor, values_from = value)
-  
-# take the mean vital rates across conditions (should this be weighted by treatment frequency??)
-vrmean <- vrsub %>%
-  select(-treatment) %>%
-  group_by(species) %>%
-  summarize_all(list(mean = mean))
-
-# take the mean interaction strengths across conditions (should this be weighted by treatment frequency??)
-intmean <- intsub2 %>%
-  select(-treatment) %>%
-  group_by(species) %>%
-  summarize_all(list(mean = mean)) 
-
-# create growth rate vector and interaction matrix
-r <- vrmean$nu_mean
-A <- as.matrix(intmean[,2:3])
-
-#we multiply by -1 as competition should be negative
-A <- A*-1
-
-de <- calculate_distance_to_border_2sp(A, r)
-
-tempout <- data.frame(species1= spcomboi[1], species2 = spcomboi[2], de = de[[1]][1], extinct = de[[2]][1], inferior = de[[3]][1])
-pairwise_average <- rbind( pairwise_average, tempout)
-
-
-#draw the cone
-draw_biodiversity_cone(A, spcomboi[1], spcomboi[2])
-#draw the vector
-point <-r/sqrt(sum(r^2))
-arrows(0, 0, x1 = point[1], y1 = point[2], length = 0.15, angle = 30,
-       code = 2, col = "brown", lty =1, lwd=2)
-text(0.8, 1, "A. Average conditions", cex = 1.2, pos = 1)
-
-
-}
-
-pairwise_average
+# ## Calculate for every pairwise combination of Muehleisen
+# 
+# pairwise_average <- data.frame(species1=character(), species2=character(), de=numeric(), extinct=numeric(), inferior = character())
+# # create vector of species
+# splist <- unique(d2vr$species)
+# 
+# #create matrix of every unique species combo
+# spcombos <- combn(splist, 2)
+# 
+# for (i in 1:ncol(spcombos)) {
+#   #subset to focal species pairs
+#   spcomboi <- spcombos[,i]
+#   vrsub <- subset(d2vr, species%in%c(spcomboi))
+#   intsub <- subset(d2int, species%in%c(spcomboi))
+#   
+#   intsub2 <- intsub %>%
+#     pivot_longer(names_to = "competitor", values_to ="value", AVFA:VUMY) %>%
+#     filter(competitor%in%c(spcombos[,i])) %>%
+#     pivot_wider(names_from = competitor, values_from = value)
+#   
+# # take the mean vital rates across conditions (should this be weighted by treatment frequency??)
+# vrmeanx <- vrsub %>%
+#   select(-treatment) %>%
+#   group_by(species) %>%
+#   summarize_all(list(mean = mean))
+# 
+# # take the mean interaction strengths across conditions (should this be weighted by treatment frequency??)
+# intmeanx <- intsub2 %>%
+#   select(-treatment) %>%
+#   group_by(species) %>%
+#   summarize_all(list(mean = mean)) 
+# 
+# # create growth rate vector and interaction matrix
+# r <- vrmeanx$nu_mean
+# A <- as.matrix(intmeanx[,2:3])
+# 
+# #we multiply by -1 as competition should be negative
+# A <- A*-1
+# 
+# de <- calculate_distance_to_border_2sp(A, r)
+# 
+# tempout <- data.frame(species1= spcomboi[1], species2 = spcomboi[2], de = de[[1]][1], extinct = de[[2]][1], inferior = de[[3]][1])
+# pairwise_average <- rbind( pairwise_average, tempout)
+# 
+# 
+# #draw the cone
+# draw_biodiversity_cone(A, spcomboi[1], spcomboi[2])
+# #draw the vector
+# point <-r/sqrt(sum(r^2))
+# arrows(0, 0, x1 = point[1], y1 = point[2], length = 0.15, angle = 30,
+#        code = 2, col = "brown", lty =1, lwd=2)
+# text(0.8, 1, "A. Average conditions", cex = 1.2, pos = 1)
+# 
+# 
+# }
+# 
+# pairwise_average
